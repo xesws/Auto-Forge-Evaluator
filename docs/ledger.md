@@ -39,4 +39,5 @@ append-only. One dated line per decision, incident, or spec deviation.
 - 2026-08-21: Packed `tasks_v3.tar.gz` sha256 `1deaedcb91d3c98a5c02688f0e83b3a3d124b58a8a5bded570ea2bd2b0f36db0`.
 - 2026-08-21: `protocol_v1.yaml` superseded before use; file retained. `protocol_v2.yaml` born complete: max_seq_len 4096, per_device_batch 2, grad_accum 8 (effective batch 16, not per-GPU). Other fields match v1. base_revision pinned at birth to HF `Qwen/Qwen2.5-1.5B-Instruct` sha `989aa7980e4cf806f80c7fef2b1adb7bc71aa306` via `model_info` (no weight download on this Mac). Never edit v2.
 - 2026-08-21: CPU dry-run with `--protocol configs/protocol_v2.yaml` green at `runs/gsm8k__pv2__tv3__20260821-0204`. Gate 0: `python scripts/run_task.py --task gsm8k --protocol configs/protocol_v2.yaml`.
+- 2026-08-21: Operator opened git-push permission. Pushed 8 local commits `ff9b731..a3d726b` to origin/main. Prior intercepts were the agent auto-mode safety layer (classified `git push` as publish), not GitHub/auth.
 
