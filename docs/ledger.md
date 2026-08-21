@@ -10,3 +10,4 @@ append-only. One dated line per decision, incident, or spec deviation.
 - 2026-08-21: Committed pre-existing `AGENTS.md` (working rules already in the clone; not listed in MANUAL §3).
 - 2026-08-21: Deleted root `开发手册v1.md` after the verbatim copy so the spec has a single path `docs/MANUAL_v1.md`.
 - 2026-08-21: Phase 1 STOP. No downloads, no training, no invented protocol keys.
+- 2026-08-21: Operator confirmed push. `git push -u origin main` created remote `main` at github.com/xesws/Auto-Forge-Evaluator (HEAD a512d97).
