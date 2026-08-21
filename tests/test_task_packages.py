@@ -99,6 +99,17 @@ class TestTaskPackages(unittest.TestCase):
                 msg=row["id"],
             )
 
+    def test_gsm8k_train_completion_not_answer_only(self) -> None:
+        train = _jsonl(_ROOT / "tasks" / "gsm8k" / "train.jsonl")
+        lengths = []
+        for row in train:
+            solution = row["reference"]["solution"]
+            self.assertNotIn("<<", solution, msg=row["id"])
+            self.assertIn("####", solution, msg=row["id"])
+            lengths.append(len(solution))
+        mean_len = sum(lengths) / len(lengths)
+        self.assertGreater(mean_len, 100)
+
     def test_spider_zip_pin_in_task_json(self) -> None:
         task = json.loads(
             (_ROOT / "tasks" / "spider" / "task.json").read_text(encoding="utf-8")

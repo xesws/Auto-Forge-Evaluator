@@ -34,4 +34,9 @@ append-only. One dated line per decision, incident, or spec deviation.
 - 2026-08-21: Storage: LocalStorage in `src/data.py`; S3Storage stub raises, credentials env-only, not configured. Extra `src/storage.py` not added so src stays the four §3 scripts plus `__init__.py`.
 - 2026-08-21: GSM8K CPU `--dry-run` S0–S6 green at `runs/gsm8k__pv1__tv2__20260821-0151`. Resume with `--run-dir` skips a sealed run. pass@8 returned 8 distinct samples. Values are not validated (tiny random model).
 - 2026-08-21: Non-dry-run refuses to start without CUDA (Mac safety). Gate 0 command is `python scripts/run_task.py --task gsm8k --protocol configs/protocol_v1.yaml`.
+- 2026-08-21: Operator Phase 3 harvest. `tasks_v2.tar.gz` superseded before use; file retained (sha256 `794ec0ea…7d48`).
+- 2026-08-21: tasks_v3: GSM8K train `reference.solution` is official answer with `<<calc>>` stripped, steps and `#### N` kept. Mean length 247.5 chars. Packer asserts mean > 100. winogrande/spider jsonl unchanged.
+- 2026-08-21: Packed `tasks_v3.tar.gz` sha256 `1deaedcb91d3c98a5c02688f0e83b3a3d124b58a8a5bded570ea2bd2b0f36db0`.
+- 2026-08-21: `protocol_v1.yaml` superseded before use; file retained. `protocol_v2.yaml` born complete: max_seq_len 4096, per_device_batch 2, grad_accum 8 (effective batch 16, not per-GPU). Other fields match v1. base_revision pinned at birth to HF `Qwen/Qwen2.5-1.5B-Instruct` sha `989aa7980e4cf806f80c7fef2b1adb7bc71aa306` via `model_info` (no weight download on this Mac). Never edit v2.
+- 2026-08-21: CPU dry-run with `--protocol configs/protocol_v2.yaml` green at `runs/gsm8k__pv2__tv3__20260821-0204`. Gate 0: `python scripts/run_task.py --task gsm8k --protocol configs/protocol_v2.yaml`.
 

@@ -16,6 +16,7 @@ from src.data import (  # noqa: E402
     S3Storage,
     completion_from_reference,
     latest_tasks_ver,
+    load_protocol,
     verify_task_manifest,
 )
 
@@ -42,7 +43,14 @@ class TestStorage(unittest.TestCase):
 
 class TestCompletions(unittest.TestCase):
     def test_gsm8k(self) -> None:
-        self.assertEqual(completion_from_reference("gsm8k", {"gold": "18"}), "#### 18")
+        self.assertEqual(
+            completion_from_reference(
+                "gsm8k", {"gold": "18", "solution": "n = 3+15\n#### 18"}
+            ),
+            "n = 3+15\n#### 18",
+        )
+        with self.assertRaises(SystemExit):
+            completion_from_reference("gsm8k", {"gold": "18"})
 
     def test_wino(self) -> None:
         self.assertEqual(completion_from_reference("winogrande", {"gold": "A"}), "A")
@@ -57,8 +65,27 @@ class TestManifestAndJournal(unittest.TestCase):
     def test_gsm8k_manifest_ok(self) -> None:
         verify_task_manifest(_ROOT / "tasks" / "gsm8k")
 
-    def test_tasks_ver_is_tv2(self) -> None:
-        self.assertEqual(latest_tasks_ver(_ROOT), "tv2")
+    def test_tasks_ver_is_latest(self) -> None:
+        self.assertEqual(latest_tasks_ver(_ROOT), "tv3")
+
+    def test_protocol_v2_deltas(self) -> None:
+        v1 = load_protocol(_ROOT / "configs" / "protocol_v1.yaml")
+        v2 = load_protocol(_ROOT / "configs" / "protocol_v2.yaml")
+        self.assertEqual(v2["max_seq_len"], 4096)
+        self.assertEqual(v2["train"]["per_device_batch"], 2)
+        self.assertEqual(v2["train"]["grad_accum"], 8)
+        self.assertEqual(
+            v2["base_revision"], "989aa7980e4cf806f80c7fef2b1adb7bc71aa306"
+        )
+        self.assertEqual(v2["base_model"], v1["base_model"])
+        self.assertEqual(v2["lora"], v1["lora"])
+        self.assertEqual(v2["pilot"], v1["pilot"])
+        self.assertEqual(v2["full"], v1["full"])
+        self.assertEqual(v2["eval"], v1["eval"])
+        self.assertEqual(v2["signals"], v1["signals"])
+        self.assertEqual(v2["seeds"], v1["seeds"])
+        self.assertEqual(v2["train"]["lr"], v1["train"]["lr"])
+        self.assertEqual(v2["train"]["loss"], v1["train"]["loss"])
 
     def test_journal_done_stages(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
