@@ -1,0 +1,47 @@
+base_model: Qwen/Qwen2.5-1.5B-Instruct
+base_revision: "989aa7980e4cf806f80c7fef2b1adb7bc71aa306"  # pinned at birth from HF hub; never edit
+dtype: bfloat16
+quantization: none                  # 16GB 下 LoRA 不量化,禁 QLoRA
+max_seq_len: 4096                   # Spider 最长 prompt 2147, 2048 会截断;数学 CoT 也要余量
+lora:
+  r: 16
+  alpha: 32
+  dropout: 0.05
+  target_modules:
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+    - gate_proj
+    - up_proj
+    - down_proj
+train:
+  lr: 1.0e-4
+  schedule: cosine
+  warmup_ratio: 0.03
+  per_device_batch: 2               # 4096 序列下 16GB 放得下
+  grad_accum: 8                     # 有效 batch 仍 = 16,所有机器(5080/H100)统一,不许按卡调
+  loss: completion_only      # prompt 部分 mask
+  template: chat             # 训练评测同用 chat template
+pilot:
+  n: 10
+  steps: 100
+  sample_seed: 20260820
+full:
+  cap: 8000
+  epochs: 3
+  sample_seed: 20260820
+eval:
+  slice_n: 200
+  slice_seed: 20260820
+  decoding: greedy
+  temperature: 0.0
+signals:
+  pass1: greedy
+  pass8:
+    k: 8
+    temperature: 1.0
+    top_p: 0.95              # 仅作信号, 标签永远 greedy
+seeds:
+  train_seed: 42
+max_new_tokens: per-task(见 §5)
