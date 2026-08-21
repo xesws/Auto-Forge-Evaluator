@@ -5,6 +5,9 @@
     "hf_path": "xlangai/spider",
     "config": "spider",
     "revision": "0c350918f3f29ec754f1181c65cdce76cd6c133c",
+    "yale_zip_gdrive_id": "1403EGqzIDoHMdQF4c9Bkyl7dZLZ5Wt6J",
+    "sha256": "00636695dabed6b5f4b8328a16b13e069a2f16591d5efcce57660669c85b121b",
+    "train": "train_spider + train_others = 8659",
     "database": {
       "page": "https://yale-lily.github.io/spider",
       "drive_id": "1403EGqzIDoHMdQF4c9Bkyl7dZLZ5Wt6J",
@@ -14,8 +17,8 @@
       "local_dir": "data_cache/spider"
     }
   },
-  "prior_label": null,
-  "pool_ref": null,
+  "prior_label": "strong-gain",
+  "pool_ref": "pool_v0.2 Spider rows: 2402.16347 Table4/5 (icl_vs_sft 注记)",
   "splits": {
     "train_n": 8659,
     "eval_n": 200,
