@@ -1,0 +1,46 @@
+base_model: Qwen/Qwen2.5-1.5B-Instruct
+base_revision: "PIN_AT_ENV_SETUP"   # Phase 3 首次拉权重时钉为具体 commit sha 并记台账
+dtype: bfloat16
+quantization: none                  # 16GB 下 LoRA 不量化,禁 QLoRA
+lora:
+  r: 16
+  alpha: 32
+  dropout: 0.05
+  target_modules:
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+    - gate_proj
+    - up_proj
+    - down_proj
+train:
+  lr: 1.0e-4
+  schedule: cosine
+  warmup_ratio: 0.03
+  per_device_batch: 4
+  grad_accum: 4
+  loss: completion_only      # prompt 部分 mask
+  template: chat             # 训练评测同用 chat template
+pilot:
+  n: 10
+  steps: 100
+  sample_seed: 20260820
+full:
+  cap: 8000
+  epochs: 3
+  sample_seed: 20260820
+eval:
+  slice_n: 200
+  slice_seed: 20260820
+  decoding: greedy
+  temperature: 0.0
+signals:
+  pass1: greedy
+  pass8:
+    k: 8
+    temperature: 1.0
+    top_p: 0.95              # 仅作信号, 标签永远 greedy
+seeds:
+  train_seed: 42
+max_new_tokens: per-task(见 §5)
