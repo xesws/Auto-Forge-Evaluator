@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import logging
 import random
 import re
 import sqlite3
@@ -21,15 +22,52 @@ ROOT = Path(__file__).resolve().parents[1]
 TASKS_DIR = ROOT / "tasks"
 CACHE_DIR = ROOT / "data_cache"
 PROTOCOL_PATH = ROOT / "configs" / "protocol_v1.yaml"
-TAR_NAME = "tasks_v1.tar.gz"
 TOP_MANIFEST = "MANIFEST.sha256"
 MAX_DOWNLOAD_BYTES = 500 * 1024 * 1024
+PROMPT_TOKEN_LIMIT = 4000
 
 GSM8K_REV = "740312add88f781978c0658806c59bc2815b9866"
 WINOGRANDE_REV = "01e74176c63542e6b0bcb004dcdea22d94fb67b5"
 SPIDER_HF_REV = "0c350918f3f29ec754f1181c65cdce76cd6c133c"
 SPIDER_DRIVE_ID = "1403EGqzIDoHMdQF4c9Bkyl7dZLZ5Wt6J"
 SPIDER_PAGE = "https://yale-lily.github.io/spider"
+SPIDER_ZIP_SHA256 = (
+    "00636695dabed6b5f4b8328a16b13e069a2f16591d5efcce57660669c85b121b"
+)
+PINNED_TARBALLS = {
+    1: "2f12baddaf5bf2e6869f427dca8d660d27ae0945a25cc0be3fc1b78862d72380",
+}
+
+GSM8K_INSTRUCTION = (
+    "Reason step by step, then give the final answer on the "
+    "last line in the form: #### <number>"
+)
+
+TASK_LABELS = {
+    "gsm8k": {
+        "prior_label": "strong-gain",
+        "pool_ref": (
+            "pool_v0.2 GSM8K rows: 2503.18892 Table1 "
+            "(greedy_vs_temp1 注记), 2502.02737, 2606.06920"
+        ),
+    },
+    "winogrande": {
+        "prior_label": "weak-or-no-gain",
+        "pool_ref": (
+            "pool_v0.2 WinoGrande rows: 2505.12716 "
+            "Table11 (51.9→51.2 / 51.4)"
+        ),
+    },
+    "spider": {
+        "prior_label": "strong-gain",
+        "pool_ref": (
+            "pool_v0.2 Spider rows: 2402.16347 "
+            "Table4/5 (icl_vs_sft 注记)"
+        ),
+    },
+}
+
+LOG = logging.getLogger("make_task_package")
 
 GSM8K_TRAIN_N = 7473
 WINOGRANDE_TRAIN_POOL_N = 40398
@@ -107,6 +145,46 @@ def gsm8k_gold(answer: str) -> str:
     return matches[-1].strip()
 
 
+def gsm8k_user_content(question: str) -> str:
+    return f"{question}\n{GSM8K_INSTRUCTION}"
+
+
+_TOKENIZER = None
+_TOKENIZER_NAME = "unavailable"
+
+
+def count_tokens(text: str) -> tuple[int, str]:
+    """Return (n_tokens, tokenizer_id). Falls back to char/3 if no tokenizer."""
+    global _TOKENIZER, _TOKENIZER_NAME
+    if _TOKENIZER is None and _TOKENIZER_NAME != "char/3":
+        try:
+            from transformers import AutoTokenizer
+
+            _TOKENIZER = AutoTokenizer.from_pretrained(
+                "Qwen/Qwen2.5-1.5B-Instruct",
+                use_fast=True,
+            )
+            _TOKENIZER_NAME = "Qwen/Qwen2.5-1.5B-Instruct"
+        except Exception as exc:  # noqa: BLE001
+            LOG.warning("tokenizer unavailable (%s); using char/3 estimate", exc)
+            _TOKENIZER_NAME = "char/3"
+    if _TOKENIZER is not None:
+        return len(_TOKENIZER.encode(text, add_special_tokens=False)), _TOKENIZER_NAME
+    return max(1, (len(text) + 2) // 3), "char/3"
+
+
+def log_if_over_token_limit(example_id: str, text: str) -> None:
+    n_tokens, method = count_tokens(text)
+    if n_tokens > PROMPT_TOKEN_LIMIT:
+        LOG.warning(
+            "prompt over %s tokens: id=%s n_tokens=%s method=%s",
+            PROMPT_TOKEN_LIMIT,
+            example_id,
+            n_tokens,
+            method,
+        )
+
+
 def build_gsm8k(protocol: dict[str, Any]) -> None:
     train_rows = read_parquet(
         hf_download(
@@ -131,7 +209,7 @@ def build_gsm8k(protocol: dict[str, Any]) -> None:
         train_out.append(
             {
                 "id": f"gsm8k-train-{i:04d}",
-                "messages": [{"role": "user", "content": str(row["question"])}],
+                "messages": [{"role": "user", "content": gsm8k_user_content(str(row["question"]))}],
                 "reference": {"gold": gsm8k_gold(str(row["answer"]))},
             }
         )
@@ -141,7 +219,7 @@ def build_gsm8k(protocol: dict[str, Any]) -> None:
         eval_out.append(
             {
                 "id": f"gsm8k-test-{i:04d}",
-                "messages": [{"role": "user", "content": str(row["question"])}],
+                "messages": [{"role": "user", "content": gsm8k_user_content(str(row["question"]))}],
                 "reference": {"gold": gsm8k_gold(str(row["answer"]))},
             }
         )
@@ -160,15 +238,18 @@ def build_gsm8k(protocol: dict[str, Any]) -> None:
                 "config": "main",
                 "revision": GSM8K_REV,
             },
-            "prior_label": None,
-            "pool_ref": None,
+            "prior_label": TASK_LABELS["gsm8k"]["prior_label"],
+            "pool_ref": TASK_LABELS["gsm8k"]["pool_ref"],
             "splits": {
                 "train_n": len(train_out),
                 "eval_n": len(eval_out),
                 "seeds": {"eval_slice_seed": eval_seed},
             },
             "max_new_tokens": 512,
-            "prompt_style": "user content is the GSM8K question text only",
+            "prompt_style": (
+                "GSM8K question, then one instruction line: "
+                + GSM8K_INSTRUCTION
+            ),
         },
     )
     write_manifest(task_dir)
@@ -253,8 +334,8 @@ def build_winogrande(protocol: dict[str, Any]) -> None:
                 "config": "winogrande_xl",
                 "revision": WINOGRANDE_REV,
             },
-            "prior_label": None,
-            "pool_ref": None,
+            "prior_label": TASK_LABELS["winogrande"]["prior_label"],
+            "pool_ref": TASK_LABELS["winogrande"]["pool_ref"],
             "splits": {
                 "train_n": len(train_out),
                 "eval_n": len(eval_out),
@@ -351,6 +432,11 @@ def build_spider(protocol: dict[str, Any]) -> None:
         print(f"Spider zip cache hit {zip_path} sha256={sha256_file(zip_path)}")
         if zip_path.stat().st_size > MAX_DOWNLOAD_BYTES:
             raise SystemExit("cached Spider zip exceeds 500MB")
+    zip_sha = sha256_file(zip_path)
+    if zip_sha != SPIDER_ZIP_SHA256:
+        raise SystemExit(
+            f"Spider zip sha256 mismatch: got {zip_sha}, pinned {SPIDER_ZIP_SHA256}"
+        )
 
     if not (extract_dir / ".done").is_file():
         extract_dir.mkdir(parents=True, exist_ok=True)
@@ -397,12 +483,15 @@ def build_spider(protocol: dict[str, Any]) -> None:
     def to_row(prefix: str, idx: int, item: dict[str, Any]) -> dict[str, Any]:
         db_id = str(item["db_id"])
         db_path = rel_db(db_id)
+        example_id = f"{prefix}-{idx:04d}"
+        content = _spider_prompt(schema(db_id), str(item["question"]))
+        log_if_over_token_limit(example_id, content)
         return {
-            "id": f"{prefix}-{idx:04d}",
+            "id": example_id,
             "messages": [
                 {
                     "role": "user",
-                    "content": _spider_prompt(schema(db_id), str(item["question"])),
+                    "content": content,
                 }
             ],
             "reference": {
@@ -415,7 +504,6 @@ def build_spider(protocol: dict[str, Any]) -> None:
     train_out = [to_row("spider-train", i, item) for i, item in enumerate(train_rows)]
     eval_out = [to_row("spider-dev", i, dev[i]) for i in eval_idx]
 
-    zip_sha = sha256_file(zip_path)
     task_dir = TASKS_DIR / "spider"
     task_dir.mkdir(parents=True, exist_ok=True)
     write_jsonl(task_dir / "train.jsonl", train_out)
@@ -429,6 +517,9 @@ def build_spider(protocol: dict[str, Any]) -> None:
                 "hf_path": "xlangai/spider",
                 "config": "spider",
                 "revision": SPIDER_HF_REV,
+                "yale_zip_gdrive_id": SPIDER_DRIVE_ID,
+                "sha256": zip_sha,
+                "train": "train_spider + train_others = 8659",
                 "database": {
                     "page": SPIDER_PAGE,
                     "drive_id": SPIDER_DRIVE_ID,
@@ -438,8 +529,8 @@ def build_spider(protocol: dict[str, Any]) -> None:
                     "local_dir": str((CACHE_DIR / "spider").relative_to(ROOT)),
                 },
             },
-            "prior_label": None,
-            "pool_ref": None,
+            "prior_label": TASK_LABELS["spider"]["prior_label"],
+            "pool_ref": TASK_LABELS["spider"]["pool_ref"],
             "splits": {
                 "train_n": len(train_out),
                 "eval_n": len(eval_out),
@@ -455,10 +546,11 @@ def build_spider(protocol: dict[str, Any]) -> None:
     print(f"spider: train={len(train_out)} eval={len(eval_out)} zip_sha={zip_sha}")
 
 
-def pack_tar(task_ids: list[str]) -> None:
-    tar_path = ROOT / TAR_NAME
+def pack_tar(task_ids: list[str], version: int) -> None:
+    tar_name = f"tasks_v{version}.tar.gz"
+    tar_path = ROOT / tar_name
     if tar_path.exists():
-        raise SystemExit(f"{TAR_NAME} already exists; versions only increase")
+        raise SystemExit(f"{tar_name} already exists; versions only increase")
     with tarfile.open(tar_path, "w:gz") as tar:
         for task_id in task_ids:
             task_dir = TASKS_DIR / task_id
@@ -467,7 +559,23 @@ def pack_tar(task_ids: list[str]) -> None:
                 if not path.is_file():
                     raise SystemExit(f"missing {path}")
                 tar.add(path, arcname=f"tasks/{task_id}/{name}")
-    lines = [f"{sha256_file(tar_path)}  {TAR_NAME}"]
+    lines = ["# published tarballs (never overwrite)"]
+    listed = set()
+    for ver, pinned in sorted(PINNED_TARBALLS.items()):
+        name = f"tasks_v{ver}.tar.gz"
+        path = ROOT / name
+        if path.is_file():
+            digest = sha256_file(path)
+            if digest != pinned:
+                raise SystemExit(f"{name} sha256 {digest} != pinned {pinned}")
+        lines.append(f"{pinned}  {name}")
+        listed.add(name)
+    new_digest = sha256_file(tar_path)
+    if tar_name not in listed:
+        lines.append(f"{new_digest}  {tar_name}")
+    elif PINNED_TARBALLS.get(version) not in (None, new_digest):
+        raise SystemExit(f"new {tar_name} hash {new_digest} != pin")
+    lines.append("# current unpacked files (match the newest tarball)")
     for task_id in task_ids:
         manifest = TASKS_DIR / task_id / "MANIFEST.sha256"
         lines.append(f"{sha256_file(manifest)}  tasks/{task_id}/MANIFEST.sha256")
@@ -475,11 +583,12 @@ def pack_tar(task_ids: list[str]) -> None:
             path = TASKS_DIR / task_id / name
             lines.append(f"{sha256_file(path)}  tasks/{task_id}/{name}")
     (ROOT / TOP_MANIFEST).write_text("\n".join(lines) + "\n", encoding="utf-8")
-    print(f"wrote {tar_path} and {TOP_MANIFEST}")
+    print(f"wrote {tar_path} sha256={new_digest} and {TOP_MANIFEST}")
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Materialize tasks_v1 packages")
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
+    parser = argparse.ArgumentParser(description="Materialize frozen task packages")
     parser.add_argument(
         "--task",
         choices=("gsm8k", "winogrande", "spider", "all"),
@@ -488,16 +597,17 @@ def main() -> None:
     parser.add_argument(
         "--pack",
         action="store_true",
-        help="write tasks_v1.tar.gz and top-level MANIFEST.sha256 after building",
+        help="write tasks_vN.tar.gz and top-level MANIFEST.sha256 after building",
     )
     parser.add_argument(
         "--pack-only",
         action="store_true",
-        help="only write tasks_v1.tar.gz and top-level MANIFEST.sha256",
+        help="only write tasks_vN.tar.gz and top-level MANIFEST.sha256",
     )
+    parser.add_argument("--pack-version", type=int, default=2)
     args = parser.parse_args()
     if args.pack_only:
-        pack_tar(["gsm8k", "winogrande", "spider"])
+        pack_tar(["gsm8k", "winogrande", "spider"], version=args.pack_version)
         return
     protocol = load_protocol()
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
@@ -509,8 +619,8 @@ def main() -> None:
     }
     for task_id in wanted:
         builders[task_id](protocol)
-    if args.pack or args.task == "all":
-        pack_tar(["gsm8k", "winogrande", "spider"])
+    if args.pack:
+        pack_tar(["gsm8k", "winogrande", "spider"], version=args.pack_version)
 
 
 if __name__ == "__main__":
