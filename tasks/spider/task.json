@@ -1,0 +1,28 @@
+{
+  "task_id": "spider",
+  "source": {
+    "dataset": "spider",
+    "hf_path": "xlangai/spider",
+    "config": "spider",
+    "revision": "0c350918f3f29ec754f1181c65cdce76cd6c133c",
+    "database": {
+      "page": "https://yale-lily.github.io/spider",
+      "drive_id": "1403EGqzIDoHMdQF4c9Bkyl7dZLZ5Wt6J",
+      "filename": "spider.zip",
+      "sha256": "00636695dabed6b5f4b8328a16b13e069a2f16591d5efcce57660669c85b121b",
+      "bytes": 205800266,
+      "local_dir": "data_cache/spider"
+    }
+  },
+  "prior_label": null,
+  "pool_ref": null,
+  "splits": {
+    "train_n": 8659,
+    "eval_n": 200,
+    "seeds": {
+      "eval_slice_seed": 20260820
+    }
+  },
+  "max_new_tokens": 256,
+  "prompt_style": "CREATE TABLE statements from sqlite_master, then the question"
+}
