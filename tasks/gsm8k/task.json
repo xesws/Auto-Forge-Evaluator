@@ -6,8 +6,8 @@
     "config": "main",
     "revision": "740312add88f781978c0658806c59bc2815b9866"
   },
-  "prior_label": null,
-  "pool_ref": null,
+  "prior_label": "strong-gain",
+  "pool_ref": "pool_v0.2 GSM8K rows: 2503.18892 Table1 (greedy_vs_temp1 注记), 2502.02737, 2606.06920",
   "splits": {
     "train_n": 7473,
     "eval_n": 200,
@@ -16,5 +16,5 @@
     }
   },
   "max_new_tokens": 512,
-  "prompt_style": "user content is the GSM8K question text only"
+  "prompt_style": "GSM8K question, then one instruction line: Reason step by step, then give the final answer on the last line in the form: #### <number>"
 }
