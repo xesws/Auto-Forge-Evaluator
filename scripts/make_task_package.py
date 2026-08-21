@@ -36,7 +36,9 @@ SPIDER_ZIP_SHA256 = (
 )
 PINNED_TARBALLS = {
     1: "2f12baddaf5bf2e6869f427dca8d660d27ae0945a25cc0be3fc1b78862d72380",
+    2: "794ec0ea78ae6a6a1b526b7682632d378d6bdd439b68e32680ebe00c2c457d48",
 }
+GSM8K_MIN_MEAN_COMPLETION = 100
 
 GSM8K_INSTRUCTION = (
     "Reason step by step, then give the final answer on the "
@@ -74,6 +76,7 @@ WINOGRANDE_TRAIN_POOL_N = 40398
 SPIDER_TRAIN_N = 8659
 
 _HASH_RE = re.compile(r"####\s*(.+)")
+_CALC_RE = re.compile(r"<<[^>]*>>")
 _TASK_FILES = ("task.json", "train.jsonl", "eval.jsonl", "verifier.py")
 
 
@@ -145,6 +148,11 @@ def gsm8k_gold(answer: str) -> str:
     return matches[-1].strip()
 
 
+def gsm8k_solution(answer: str) -> str:
+    """Official GSM8K solution: drop <<calc>> annotations, keep steps and #### N."""
+    return _CALC_RE.sub("", str(answer)).strip()
+
+
 def gsm8k_user_content(question: str) -> str:
     return f"{question}\n{GSM8K_INSTRUCTION}"
 
@@ -206,12 +214,24 @@ def build_gsm8k(protocol: dict[str, Any]) -> None:
 
     train_out = []
     for i, row in enumerate(train_rows):
+        answer = str(row["answer"])
         train_out.append(
             {
                 "id": f"gsm8k-train-{i:04d}",
                 "messages": [{"role": "user", "content": gsm8k_user_content(str(row["question"]))}],
-                "reference": {"gold": gsm8k_gold(str(row["answer"]))},
+                "reference": {
+                    "gold": gsm8k_gold(answer),
+                    "solution": gsm8k_solution(answer),
+                },
             }
+        )
+    mean_len = sum(len(row["reference"]["solution"]) for row in train_out) / len(
+        train_out
+    )
+    if mean_len <= GSM8K_MIN_MEAN_COMPLETION:
+        raise SystemExit(
+            f"gsm8k train completion mean length {mean_len:.1f} "
+            f"<= {GSM8K_MIN_MEAN_COMPLETION} (answer-only regression?)"
         )
     eval_out = []
     for i in eval_idx:
@@ -253,7 +273,10 @@ def build_gsm8k(protocol: dict[str, Any]) -> None:
         },
     )
     write_manifest(task_dir)
-    print(f"gsm8k: train={len(train_out)} eval={len(eval_out)}")
+    print(
+        f"gsm8k: train={len(train_out)} eval={len(eval_out)} "
+        f"train_completion_mean_len={mean_len:.1f}"
+    )
 
 
 def _wino_gold(answer: Any) -> str:
@@ -604,7 +627,7 @@ def main() -> None:
         action="store_true",
         help="only write tasks_vN.tar.gz and top-level MANIFEST.sha256",
     )
-    parser.add_argument("--pack-version", type=int, default=2)
+    parser.add_argument("--pack-version", type=int, default=3)
     args = parser.parse_args()
     if args.pack_only:
         pack_tar(["gsm8k", "winogrande", "spider"], version=args.pack_version)

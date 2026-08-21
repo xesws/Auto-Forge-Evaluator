@@ -16,7 +16,6 @@ from src.data import completion_from_reference
 LOG = logging.getLogger("forge.train")
 DRY_RUN_MODEL = "yujiepan/qwen2-tiny-random"
 DRY_RUN_MAX_SEQ = 512
-REAL_MAX_SEQ = 2048  # MANUAL has no max_seq_len; recorded in ledger.
 
 
 class CompletionDataset(Dataset):
@@ -190,7 +189,7 @@ def train_lora(
     seed: int,
 ) -> None:
     torch.manual_seed(seed)
-    max_seq_len = DRY_RUN_MAX_SEQ if dry_run else REAL_MAX_SEQ
+    max_seq_len = DRY_RUN_MAX_SEQ if dry_run else int(protocol["max_seq_len"])
     dataset = CompletionDataset(rows, tokenizer, task_id, max_seq_len=max_seq_len)
     if len(dataset) == 0:
         raise SystemExit("empty train split")

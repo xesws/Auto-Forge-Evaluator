@@ -453,7 +453,7 @@ def main() -> None:
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
     parser = argparse.ArgumentParser(description="Run one task pipeline")
     parser.add_argument("--task", required=True, choices=("gsm8k", "winogrande", "spider"))
-    parser.add_argument("--protocol", default=str(ROOT / "configs" / "protocol_v1.yaml"))
+    parser.add_argument("--protocol", default=str(ROOT / "configs" / "protocol_v2.yaml"))
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--run-dir", default=None)
     parser.add_argument("--tasks-ver", default=None)

@@ -139,7 +139,10 @@ def load_verifier(task_dir: Path) -> Any:
 
 def completion_from_reference(task_id: str, reference: dict[str, Any]) -> str:
     if task_id == "gsm8k":
-        return f"#### {reference['gold']}"
+        solution = reference.get("solution")
+        if not solution:
+            raise SystemExit("gsm8k completion requires reference.solution (not answer-only)")
+        return str(solution)
     if task_id == "winogrande":
         return str(reference["gold"])
     if task_id == "spider":
