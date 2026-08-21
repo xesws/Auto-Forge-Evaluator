@@ -1,0 +1,31 @@
+# MANUAL §3 / AGENTS.md — artifacts tracked by MANIFEST, not git
+runs/
+data_cache/
+*.tar.gz
+
+# model weights
+*.bin
+*.safetensors
+*.pt
+*.pth
+*.ckpt
+*.gguf
+*.onnx
+
+# database files (Spider)
+*.sqlite
+*.sqlite3
+*.db
+
+# python / local
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+.env
+.DS_Store
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
