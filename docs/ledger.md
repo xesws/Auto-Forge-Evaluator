@@ -12,4 +12,6 @@ append-only. One dated line per decision, incident, or spec deviation.
 - 2026-08-21: Phase 1 STOP. No downloads, no training, no invented protocol keys.
 - 2026-08-21: Operator confirmed push. `git push -u origin main` created remote `main` at github.com/xesws/Auto-Forge-Evaluator (HEAD a512d97).
 - 2026-08-21: Phase 2 start. GSM8K verifier: prefer `####` then last number; both extracts in JSON `note`; numeric compare after strip comma/space with abs tol 1e-6.
+- 2026-08-21: WinoGrande verifier: first A/B; accepts `A.`, `答案:A`, `Answer: B`; parse fail → parsed=None. Bare English article `a` is not an answer.
+- 2026-08-21: Spider verifier: extract SQL (fence or raw, must have SELECT/WITH/DML); sqlite ro exec vs gold; Counter/multiset row compare; 30s interrupt → TimeoutError in note. Fixture DBs only in tests so far.
 
