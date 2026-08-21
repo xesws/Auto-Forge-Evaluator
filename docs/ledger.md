@@ -18,4 +18,9 @@ append-only. One dated line per decision, incident, or spec deviation.
 - 2026-08-21: `prior_label` and `pool_ref` in task.json set to JSON null — MANUAL lists the keys but gives no values. Not filled in.
 - 2026-08-21: Materialized gsm8k: official train 7473, test sample 200 with eval.slice_seed 20260820. Gold self-check on 5 eval rows passed.
 - 2026-08-21: Materialized winogrande_xl: pool 40398 downsampled to 8000 with full.sample_seed 20260820; validation sample 200. Gold letters mapped from HF answer field `1`/`2` → `A`/`B`.
+- 2026-08-21: HF xlangai/spider train is 7000; MANUAL requires official 8659. Used official Yale zip (`train_spider.json` 7000 + `train_others.json` 1659). Recorded HF revision in task.json as named by §5, questions+DBs taken from the zip.
+- 2026-08-21: Spider official zip from yale-lily.github.io GDrive id `1403EGqzIDoHMdQF4c9Bkyl7dZLZ5Wt6J`, Drive name `spider_data.zip`, 205800266 bytes (~196MB, under 500MB abort), sha256 `00636695dabed6b5f4b8328a16b13e069a2f16591d5efcce57660669c85b121b`. MANUAL said ~100MB; actual is larger. Kept in `data_cache/spider/` (gitignored).
+- 2026-08-21: Materialized spider train 8659 / eval 200. Gold SQL execution on all 200 eval rows passed. db_path is relative under `data_cache/spider/extract/`.
+- 2026-08-21: Packed `tasks_v1.tar.gz` (1654675 bytes, sha256 `2f12baddaf5bf2e6869f427dca8d660d27ae0945a25cc0be3fc1b78862d72380`) + top-level `MANIFEST.sha256`. tar.gz gitignored; MANIFEST tracked.
+- 2026-08-21: Phase 2 STOP. Unresolved: prior_label/pool_ref are null; GSM8K prompt is question-only; Spider CREATE TABLE dump is full sqlite_master SQL not a hand-written 摘要.
 
