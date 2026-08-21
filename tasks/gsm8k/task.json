@@ -1,0 +1,20 @@
+{
+  "task_id": "gsm8k",
+  "source": {
+    "dataset": "gsm8k",
+    "hf_path": "openai/gsm8k",
+    "config": "main",
+    "revision": "740312add88f781978c0658806c59bc2815b9866"
+  },
+  "prior_label": null,
+  "pool_ref": null,
+  "splits": {
+    "train_n": 7473,
+    "eval_n": 200,
+    "seeds": {
+      "eval_slice_seed": 20260820
+    }
+  },
+  "max_new_tokens": 512,
+  "prompt_style": "user content is the GSM8K question text only"
+}
