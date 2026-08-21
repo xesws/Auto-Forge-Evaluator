@@ -1,0 +1,21 @@
+{
+  "task_id": "winogrande",
+  "source": {
+    "dataset": "winogrande",
+    "hf_path": "allenai/winogrande",
+    "config": "winogrande_xl",
+    "revision": "01e74176c63542e6b0bcb004dcdea22d94fb67b5"
+  },
+  "prior_label": null,
+  "pool_ref": null,
+  "splits": {
+    "train_n": 8000,
+    "eval_n": 200,
+    "seeds": {
+      "train_sample_seed": 20260820,
+      "eval_slice_seed": 20260820
+    }
+  },
+  "max_new_tokens": 16,
+  "prompt_style": "sentence plus options A/B; instruction to reply with only the letter"
+}
