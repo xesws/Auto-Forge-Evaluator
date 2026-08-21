@@ -279,10 +279,9 @@ def _gdrive_download(file_id: str, dest: Path) -> None:
     except ImportError as exc:
         raise SystemExit("gdown is required for Spider: pip install gdown") from exc
     dest.parent.mkdir(parents=True, exist_ok=True)
-    url = f"https://drive.google.com/uc?id={file_id}"
     print(f"Spider DB zip: official Yale GDrive id={file_id} page={SPIDER_PAGE}")
     print(f"MANUAL §5 says ~100MB; abort if downloaded bytes > {MAX_DOWNLOAD_BYTES}")
-    out = gdown.download(url=url, output=str(dest), quiet=False, fuzzy=True)
+    out = gdown.download(id=file_id, output=str(dest), quiet=False)
     if not out:
         raise SystemExit("gdown failed to download Spider zip")
     size = dest.stat().st_size
@@ -489,9 +488,17 @@ def main() -> None:
     parser.add_argument(
         "--pack",
         action="store_true",
-        help="write tasks_v1.tar.gz and top-level MANIFEST.sha256",
+        help="write tasks_v1.tar.gz and top-level MANIFEST.sha256 after building",
+    )
+    parser.add_argument(
+        "--pack-only",
+        action="store_true",
+        help="only write tasks_v1.tar.gz and top-level MANIFEST.sha256",
     )
     args = parser.parse_args()
+    if args.pack_only:
+        pack_tar(["gsm8k", "winogrande", "spider"])
+        return
     protocol = load_protocol()
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
     wanted = ("gsm8k", "winogrande", "spider") if args.task == "all" else (args.task,)
