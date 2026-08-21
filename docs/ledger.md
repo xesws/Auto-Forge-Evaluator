@@ -14,4 +14,8 @@ append-only. One dated line per decision, incident, or spec deviation.
 - 2026-08-21: Phase 2 start. GSM8K verifier: prefer `####` then last number; both extracts in JSON `note`; numeric compare after strip comma/space with abs tol 1e-6.
 - 2026-08-21: WinoGrande verifier: first A/B; accepts `A.`, `答案:A`, `Answer: B`; parse fail → parsed=None. Bare English article `a` is not an answer.
 - 2026-08-21: Spider verifier: extract SQL (fence or raw, must have SELECT/WITH/DML); sqlite ro exec vs gold; Counter/multiset row compare; 30s interrupt → TimeoutError in note. Fixture DBs only in tests so far.
+- 2026-08-21: `scripts/make_task_package.py` pins HF revisions observed 2026-08-21: openai/gsm8k `740312add88f781978c0658806c59bc2815b9866`, allenai/winogrande `01e74176c63542e6b0bcb004dcdea22d94fb67b5`, xlangai/spider `0c350918f3f29ec754f1181c65cdce76cd6c133c`. Slice/sample seeds and eval_n/cap read from protocol_v1.yaml, not invented.
+- 2026-08-21: `prior_label` and `pool_ref` in task.json set to JSON null — MANUAL lists the keys but gives no values. Not filled in.
+- 2026-08-21: Materialized gsm8k: official train 7473, test sample 200 with eval.slice_seed 20260820. Gold self-check on 5 eval rows passed.
+- 2026-08-21: Materialized winogrande_xl: pool 40398 downsampled to 8000 with full.sample_seed 20260820; validation sample 200. Gold letters mapped from HF answer field `1`/`2` → `A`/`B`.
 
