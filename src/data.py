@@ -163,6 +163,72 @@ def warn_long_prompts(rows: list[dict[str, Any]], encode: Callable[[str], int]) 
             )
 
 
+def _note(sample: dict[str, Any]) -> dict[str, Any]:
+    raw = sample.get("note") or "{}"
+    try:
+        payload = json.loads(raw) if isinstance(raw, str) else dict(raw)
+    except json.JSONDecodeError:
+        payload = {}
+    return payload
+
+
+def format_compliance_for_split(path: Path, task_id: str) -> dict[str, Any]:
+    """Derived extractor-channel counts. Does not change labels or scores."""
+    if not path.is_file():
+        return {"n": 0, "missing": True}
+    rows = load_jsonl(path)
+    if task_id == "gsm8k":
+        hashed = last_only = none = diverge = 0
+        for row in rows:
+            note = _note(row["samples"][0])
+            if note.get("diverge"):
+                diverge += 1
+            if note.get("hash_raw") is not None:
+                hashed += 1
+            elif note.get("last_raw") is not None:
+                last_only += 1
+            else:
+                none += 1
+        return {
+            "n": len(rows),
+            "hash": hashed,
+            "last_only": last_only,
+            "none": none,
+            "diverge": diverge,
+        }
+    parsed: dict[str, int] = {}
+    unparseable = 0
+    exceptions: dict[str, int] = {}
+    for row in rows:
+        sample = row["samples"][0]
+        note = _note(sample)
+        if sample.get("parsed") is None or note.get("unparseable") is True:
+            unparseable += 1
+        else:
+            key = str(sample["parsed"])
+            if task_id == "spider":
+                key = "parsed"
+            parsed[key] = parsed.get(key, 0) + 1
+        exc = note.get("exception")
+        if exc:
+            exceptions[str(exc)] = exceptions.get(str(exc), 0) + 1
+    out: dict[str, Any] = {
+        "n": len(rows),
+        "unparseable": unparseable,
+        "parsed": parsed,
+    }
+    if exceptions:
+        out["exception"] = exceptions
+    return out
+
+
+def format_compliance_block(run_dir: Path, task_id: str) -> dict[str, Any]:
+    return {
+        split: format_compliance_for_split(run_dir / f"eval_{split}_greedy.jsonl", task_id)
+        for split in ("base", "pilot", "full")
+    }
+
+
 def latest_tasks_ver(repo_root: Path) -> str:
     manifest = repo_root / "MANIFEST.sha256"
     versions: list[int] = []

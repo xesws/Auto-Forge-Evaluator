@@ -44,4 +44,5 @@ append-only. One dated line per decision, incident, or spec deviation.
 - 2026-08-21: Operator `go`. Gate 0 started in tmux `gate0` on pod. Run dir `runs/gsm8k__pv2__tv3__20260821-1038`. S0 done, revision pin matches, dry_run=false, eval_n=200. S1 eval_base started ~10:38 UTC.
 - 2026-08-21: Gate 0 gsm8k sealed S6 12:47:44 UTC. Five-eye: unparseable 0/200=0%; extract_div file missing (0); S2 loss 0.449→3.67e-05; base pass@1=0.69 (band 40-75); systems complete. Δ_pilot=-0.335, Δ_full=-0.230. Greedy rerun 200/200 pass-set match (DETERMINISM_OK). Started Gate 1 tmux `gate1` (winogrande then spider).
 - 2026-08-21: Operator: Gate 0 暂判不通过 (五眼未按工单交齐). Gate 1 在五眼裁决前开跑违反工单. winogrande run `winogrande__pv2__tv3__20260821-2105` 保留. spider `spider__pv2__tv3__20260821-2137` 已于 S4 中途 SIGTERM 停掉 (journal 停在 S4 start 22:20:21); 诊断完成前不再启动 spider.
+- 2026-08-21: Operator Gate 0 通过 (五眼+确定性全绿; gsm8k 负 Δ = 格式覆盖伴随推理退化). metrics.json 增补派生字段 format_compliance (不升协议版本). HF_TOKEN warning 忽略, token 不上 pod. Spider 从 journal S4 边界续跑, S0-S3 保留.
 

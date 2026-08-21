@@ -19,6 +19,7 @@ sys.path.insert(0, str(ROOT))
 
 from src.data import (  # noqa: E402
     LocalStorage,
+    format_compliance_block,
     latest_tasks_ver,
     load_jsonl,
     load_protocol,
@@ -431,6 +432,7 @@ def run(args: argparse.Namespace) -> None:
                 dry_run,
                 seeds,
             ),
+            "format_compliance": format_compliance_block(run_dir, task_id),
             "hashes": hashes,
         }
         dump_json(run_dir / "metrics.json", metrics)

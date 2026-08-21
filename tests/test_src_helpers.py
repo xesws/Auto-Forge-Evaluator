@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -15,6 +16,7 @@ from src.data import (  # noqa: E402
     LocalStorage,
     S3Storage,
     completion_from_reference,
+    format_compliance_for_split,
     latest_tasks_ver,
     load_protocol,
     verify_task_manifest,
@@ -39,6 +41,54 @@ class TestStorage(unittest.TestCase):
     def test_s3_stub_raises(self) -> None:
         with self.assertRaises(NotImplementedError):
             S3Storage()
+
+
+class TestFormatCompliance(unittest.TestCase):
+    def test_gsm8k_channels(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "eval_base_greedy.jsonl"
+            rows = [
+                {
+                    "id": "a",
+                    "samples": [
+                        {
+                            "pass": True,
+                            "parsed": "10",
+                            "note": json.dumps(
+                                {
+                                    "hash_raw": "10",
+                                    "last_raw": "10",
+                                    "diverge": False,
+                                }
+                            ),
+                        }
+                    ],
+                },
+                {
+                    "id": "b",
+                    "samples": [
+                        {
+                            "pass": True,
+                            "parsed": "5",
+                            "note": json.dumps(
+                                {
+                                    "hash_raw": None,
+                                    "last_raw": "5",
+                                    "diverge": False,
+                                }
+                            ),
+                        }
+                    ],
+                },
+            ]
+            path.write_text(
+                "".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8"
+            )
+            stats = format_compliance_for_split(path, "gsm8k")
+            self.assertEqual(stats["n"], 2)
+            self.assertEqual(stats["hash"], 1)
+            self.assertEqual(stats["last_only"], 1)
+            self.assertEqual(stats["diverge"], 0)
 
 
 class TestCompletions(unittest.TestCase):
