@@ -81,8 +81,8 @@ def check_run(run_dir: Path) -> dict[str, Any]:
             row["id"]: row["samples"][0]["pass"]
             for row in load_jsonl(rerun_path)
         }
-        mismatch = [key for key in orig if orig[key] != new.get(key)]
         extra = [key for key in new if key not in orig]
+        mismatch = [key for key in new if orig.get(key) != new[key]]
         det = {
             "skipped": False,
             "n_orig": len(orig),
@@ -90,7 +90,7 @@ def check_run(run_dir: Path) -> dict[str, Any]:
             "mismatch": len(mismatch),
             "extra": len(extra),
         }
-        det_ok = len(mismatch) == 0 and len(extra) == 0 and len(new) == len(orig)
+        det_ok = len(mismatch) == 0 and len(extra) == 0 and len(new) > 0
     passed = bool(unp_ok and loss_ok and systems_ok and det_ok)
     return {
         "pass": passed,

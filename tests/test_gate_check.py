@@ -89,6 +89,27 @@ class TestGateCheck(unittest.TestCase):
             report = gate_check.check_run(run)
             self.assertFalse(report["loss"]["ok"])
 
+    def test_rerun_subset_match(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            run = Path(tmp)
+            rows = [_row("a", True, "A"), _row("b", False, "B")]
+            _write_jsonl(run / "eval_base_greedy.jsonl", rows)
+            _write_jsonl(run / "eval_base_greedy_rerun.jsonl", [_row("b", False, "B")])
+            (run / "metrics.json").write_text(json.dumps(self._metrics()), encoding="utf-8")
+            report = gate_check.check_run(run)
+            self.assertTrue(report["determinism"]["ok"])
+            self.assertEqual(report["determinism"]["n_rerun"], 1)
+
+    def test_rerun_subset_mismatch(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            run = Path(tmp)
+            rows = [_row("a", True, "A"), _row("b", False, "B")]
+            _write_jsonl(run / "eval_base_greedy.jsonl", rows)
+            _write_jsonl(run / "eval_base_greedy_rerun.jsonl", [_row("b", True, "B")])
+            (run / "metrics.json").write_text(json.dumps(self._metrics()), encoding="utf-8")
+            report = gate_check.check_run(run)
+            self.assertFalse(report["determinism"]["ok"])
+
     def test_systems_missing_fail(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             run = Path(tmp)

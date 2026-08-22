@@ -858,6 +858,8 @@ def main() -> None:
         wanted = list(LIT_IDS)
     elif args.only:
         wanted = [x.strip() for x in args.only.split(",") if x.strip()]
+    elif args.pack:
+        wanted = []
     else:
         wanted = list(LIT_IDS) + ni_ids
     for task_id in wanted:
@@ -871,10 +873,10 @@ def main() -> None:
         present = [
             tid
             for tid in (LIT_IDS + ni_ids)
-            if (TASKS_DIR / tid / "task.json").is_file()
+            if tid != "bird" and (TASKS_DIR / tid / "task.json").is_file()
         ]
-        if len(present) != 60:
-            raise SystemExit(f"refusing to pack v4: have {len(present)}/60")
+        if len(present) != 59:
+            raise SystemExit(f"refusing to pack v4: have {len(present)}/59 (bird is v5)")
         pack_tar(present, version=4)
 
 
