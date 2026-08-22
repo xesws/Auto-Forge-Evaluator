@@ -1,0 +1,311 @@
+{
+  "clone": "https://github.com/allenai/natural-instructions.git",
+  "sha": "55a365637381ce7f3748fa2eac7aef1a113bbb82",
+  "seed": 20260822,
+  "n": 50,
+  "surviving": 890,
+  "max_per_source": 3,
+  "min_instances": 210,
+  "tasks": [
+    {
+      "task_id": "task010_mctaco_answer_generation_event_ordering",
+      "stratum": "Question Answering",
+      "source": "mctaco",
+      "n_instances": 331
+    },
+    {
+      "task_id": "task014_mctaco_wrong_answer_generation_absolute_timepoint",
+      "stratum": "Wrong Candidate Generation",
+      "source": "mctaco",
+      "n_instances": 313
+    },
+    {
+      "task_id": "task016_mctaco_answer_generation_frequency",
+      "stratum": "Question Answering",
+      "source": "mctaco",
+      "n_instances": 321
+    },
+    {
+      "task_id": "task026_drop_question_generation",
+      "stratum": "Question Generation",
+      "source": "drop",
+      "n_instances": 6107
+    },
+    {
+      "task_id": "task037_qasc_generate_related_fact",
+      "stratum": "Sentence Composition",
+      "source": "qasc",
+      "n_instances": 6500
+    },
+    {
+      "task_id": "task071_abductivenli_answer_generation",
+      "stratum": "Story Composition",
+      "source": "abductive_nli",
+      "n_instances": 6500
+    },
+    {
+      "task_id": "task076_splash_correcting_sql_mistake",
+      "stratum": "Text to Code",
+      "source": "splash",
+      "n_instances": 2098
+    },
+    {
+      "task_id": "task094_conala_calculate_mean",
+      "stratum": "Program Execution",
+      "source": "conala",
+      "n_instances": 5000
+    },
+    {
+      "task_id": "task113_count_frequency_of_letter",
+      "stratum": "Program Execution",
+      "source": "synthetic",
+      "n_instances": 6500
+    },
+    {
+      "task_id": "task1202_atomic_classification_xneed",
+      "stratum": "Commonsense Classification",
+      "source": "atomic",
+      "n_instances": 6493
+    },
+    {
+      "task_id": "task1283_hrngo_quality_classification",
+      "stratum": "Text Quality Evaluation",
+      "source": "human_ratings_of_natural_language_generation_outputs",
+      "n_instances": 3975
+    },
+    {
+      "task_id": "task1287_glue_qqp_paraphrasing",
+      "stratum": "Text Matching",
+      "source": "qqp",
+      "n_instances": 6493
+    },
+    {
+      "task_id": "task1295_adversarial_qa_question_answering",
+      "stratum": "Question Answering",
+      "source": "adversarial_qa",
+      "n_instances": 6494
+    },
+    {
+      "task_id": "task1313_amazonreview_polarity_classification",
+      "stratum": "Sentiment Analysis",
+      "source": "multilingual_amazon_reviews",
+      "n_instances": 3022
+    },
+    {
+      "task_id": "task1386_anli_r2_entailment",
+      "stratum": "Textual Entailment",
+      "source": "anli",
+      "n_instances": 993
+    },
+    {
+      "task_id": "task1392_superglue_multirc_answer_verification",
+      "stratum": "Answer Verification",
+      "source": "multirc",
+      "n_instances": 6494
+    },
+    {
+      "task_id": "task1411_dart_subject_identification",
+      "stratum": "Information Extraction",
+      "source": "dart",
+      "n_instances": 3192
+    },
+    {
+      "task_id": "task1419_mathqa_gain",
+      "stratum": "Question Answering",
+      "source": "mathqa",
+      "n_instances": 6417
+    },
+    {
+      "task_id": "task1420_mathqa_general",
+      "stratum": "Question Answering",
+      "source": "mathqa",
+      "n_instances": 6452
+    },
+    {
+      "task_id": "task1541_agnews_classification",
+      "stratum": "Text Categorization",
+      "source": "ag_news",
+      "n_instances": 3999
+    },
+    {
+      "task_id": "task1553_cnn_dailymail_summarization",
+      "stratum": "Summarization",
+      "source": "cnn_dailymail",
+      "n_instances": 950
+    },
+    {
+      "task_id": "task1600_smcalflow_sentence_generation",
+      "stratum": "Dialogue Generation",
+      "source": "smcalflow",
+      "n_instances": 1029
+    },
+    {
+      "task_id": "task1622_disfl_qa_text_modication",
+      "stratum": "Question Rewriting",
+      "source": "disfl_qa",
+      "n_instances": 1995
+    },
+    {
+      "task_id": "task163_count_words_ending_with_letter",
+      "stratum": "Program Execution",
+      "source": "synthetic",
+      "n_instances": 5761
+    },
+    {
+      "task_id": "task1661_super_glue_classification",
+      "stratum": "Question Answering",
+      "source": "boolq",
+      "n_instances": 4000
+    },
+    {
+      "task_id": "task1712_poki_classification",
+      "stratum": "Text Categorization",
+      "source": "poki",
+      "n_instances": 6448
+    },
+    {
+      "task_id": "task196_sentiment140_answer_generation",
+      "stratum": "Sentiment Analysis",
+      "source": "sentiment140",
+      "n_instances": 6500
+    },
+    {
+      "task_id": "task227_clariq_classification",
+      "stratum": "Question Understanding",
+      "source": "clariq",
+      "n_instances": 6500
+    },
+    {
+      "task_id": "task236_iirc_question_from_passage_answer_generation",
+      "stratum": "Question Generation",
+      "source": "iirc",
+      "n_instances": 6500
+    },
+    {
+      "task_id": "task242_tweetqa_classification",
+      "stratum": "Answerability Classification",
+      "source": "tweetqa",
+      "n_instances": 5994
+    },
+    {
+      "task_id": "task278_stereoset_sentence_generation_antistereotype",
+      "stratum": "Fill in The Blank",
+      "source": "stereoset",
+      "n_instances": 737
+    },
+    {
+      "task_id": "task286_olid_offense_judgment",
+      "stratum": "Toxic Language Detection",
+      "source": "olid",
+      "n_instances": 5985
+    },
+    {
+      "task_id": "task305_jeopardy_answer_generation_normal",
+      "stratum": "Misc.",
+      "source": "jeopardy",
+      "n_instances": 6499
+    },
+    {
+      "task_id": "task339_record_answer_generation",
+      "stratum": "Question Answering",
+      "source": "record",
+      "n_instances": 6497
+    },
+    {
+      "task_id": "task345_hybridqa_answer_generation",
+      "stratum": "Pos Tagging",
+      "source": "hybridqa",
+      "n_instances": 6496
+    },
+    {
+      "task_id": "task366_synthetic_return_primes",
+      "stratum": "Program Execution",
+      "source": "synthetic",
+      "n_instances": 6500
+    },
+    {
+      "task_id": "task383_matres_classification",
+      "stratum": "Misc.",
+      "source": "matres",
+      "n_instances": 1917
+    },
+    {
+      "task_id": "task401_numeric_fused_head_reference",
+      "stratum": "Coreference Resolution",
+      "source": "numeric_fused_head",
+      "n_instances": 3746
+    },
+    {
+      "task_id": "task404_grailqa_paraphrase_validation",
+      "stratum": "Text Matching",
+      "source": "grailqa",
+      "n_instances": 1209
+    },
+    {
+      "task_id": "task419_persent_answer_generation",
+      "stratum": "Named Entity Recognition",
+      "source": "persent",
+      "n_instances": 3354
+    },
+    {
+      "task_id": "task430_senteval_subject_count",
+      "stratum": "Linguistic Probing",
+      "source": "senteval",
+      "n_instances": 6500
+    },
+    {
+      "task_id": "task455_swag_context_generation",
+      "stratum": "Text Completion",
+      "source": "swag",
+      "n_instances": 6500
+    },
+    {
+      "task_id": "task568_circa_question_generation",
+      "stratum": "Question Generation",
+      "source": "circa",
+      "n_instances": 6205
+    },
+    {
+      "task_id": "task607_sbic_intentional_offense_binary_classification",
+      "stratum": "Toxic Language Detection",
+      "source": "sbic",
+      "n_instances": 1731
+    },
+    {
+      "task_id": "task619_ohsumed_abstract_title_generation",
+      "stratum": "Title Generation",
+      "source": "ohsumed",
+      "n_instances": 1259
+    },
+    {
+      "task_id": "task634_allegro_reviews_classification",
+      "stratum": "Sentiment Analysis",
+      "source": "allegro_reviews",
+      "n_instances": 1523
+    },
+    {
+      "task_id": "task647_answer_generation",
+      "stratum": "Information Extraction",
+      "source": "winograd_wsc",
+      "n_instances": 242
+    },
+    {
+      "task_id": "task649_race_blank_question_generation",
+      "stratum": "Question Generation",
+      "source": "race",
+      "n_instances": 6500
+    },
+    {
+      "task_id": "task677_ollie_sentence_answer_generation",
+      "stratum": "Data to Text",
+      "source": "ollie",
+      "n_instances": 4510
+    },
+    {
+      "task_id": "task896_miam_language_classification",
+      "stratum": "Language Identification",
+      "source": "miam",
+      "n_instances": 3204
+    }
+  ]
+}

@@ -98,3 +98,67 @@ SuperNI 的 `pool_ref` = `superni stratified sample seed 20260822`。
 
 S2 名单出来之前开量产 run;加主模型特征;改 go 阈值;改协议;打 MATH-500 或 MBPP+;
 因看到分数再滤 TyDiQA 语言;把簇稳健性变成主终点。
+
+---
+
+## Commit S2 冻结值(抽样之后写入)
+
+- clone: `https://github.com/allenai/natural-instructions.git` (depth 1)
+- HEAD SHA: `55a365637381ce7f3748fa2eac7aef1a113bbb82`
+- English+规模 存活集: **890** (≥50)
+- 种子 20260822, n=50, `Source[0]` ≤3: 名单 `docs/prod_lists/superni_50.json`
+- 静态名单: `docs/prod_lists/pod_a.txt` (30 = 5 文献含 APPS + 25 SuperNI),
+  `docs/prod_lists/pod_b.txt` (30 = 5 文献含 BIRD + 25 SuperNI)
+
+50 个 task id(按 id 排序,与抽样脚本输出一致):
+
+task010_mctaco_answer_generation_event_ordering
+task014_mctaco_wrong_answer_generation_absolute_timepoint
+task016_mctaco_answer_generation_frequency
+task026_drop_question_generation
+task037_qasc_generate_related_fact
+task071_abductivenli_answer_generation
+task076_splash_correcting_sql_mistake
+task094_conala_calculate_mean
+task113_count_frequency_of_letter
+task1202_atomic_classification_xneed
+task1283_hrngo_quality_classification
+task1287_glue_qqp_paraphrasing
+task1295_adversarial_qa_question_answering
+task1313_amazonreview_polarity_classification
+task1386_anli_r2_entailment
+task1392_superglue_multirc_answer_verification
+task1411_dart_subject_identification
+task1419_mathqa_gain
+task1420_mathqa_general
+task1541_agnews_classification
+task1553_cnn_dailymail_summarization
+task1600_smcalflow_sentence_generation
+task1622_disfl_qa_text_modication
+task163_count_words_ending_with_letter
+task1661_super_glue_classification
+task1712_poki_classification
+task196_sentiment140_answer_generation
+task227_clariq_classification
+task236_iirc_question_from_passage_answer_generation
+task242_tweetqa_classification
+task278_stereoset_sentence_generation_antistereotype
+task286_olid_offense_judgment
+task305_jeopardy_answer_generation_normal
+task339_record_answer_generation
+task345_hybridqa_answer_generation
+task366_synthetic_return_primes
+task383_matres_classification
+task401_numeric_fused_head_reference
+task404_grailqa_paraphrase_validation
+task419_persent_answer_generation
+task430_senteval_subject_count
+task455_swag_context_generation
+task568_circa_question_generation
+task607_sbic_intentional_offense_binary_classification
+task619_ohsumed_abstract_title_generation
+task634_allegro_reviews_classification
+task647_answer_generation
+task649_race_blank_question_generation
+task677_ollie_sentence_answer_generation
+task896_miam_language_classification
