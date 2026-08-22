@@ -170,7 +170,7 @@ class TestManifestAndJournal(unittest.TestCase):
         verify_task_manifest(_ROOT / "tasks" / "gsm8k")
 
     def test_tasks_ver_is_latest(self) -> None:
-        self.assertEqual(latest_tasks_ver(_ROOT), "tv4")
+        self.assertEqual(latest_tasks_ver(_ROOT), "tv5")
 
     def test_protocol_v2_deltas(self) -> None:
         v1 = load_protocol(_ROOT / "configs" / "protocol_v1.yaml")

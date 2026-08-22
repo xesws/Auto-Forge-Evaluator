@@ -1,0 +1,24 @@
+{
+  "task_id": "bird",
+  "source": {
+    "dataset": "bird",
+    "hf_path": "Sudnya/bird-sql",
+    "revision": "7877a1bfee6b3794f5026b1f00fcc4dd43e529be",
+    "train_zip": "databases/train_databases.zip",
+    "dev_zip": "databases/dev_databases.zip",
+    "train_zip_sha256": "54424b2004cea43f1fd89605b3df41836df3a46bc68ffd5444c6549c112172f3",
+    "dev_zip_sha256": "cc9d46319bf6cd74c6aef865f91a25993654cb0bf76d807c9cea00eda338dd28"
+  },
+  "prior_label": null,
+  "pool_ref": "literature-layer Phase 4; folded MATH500→MATH, MBPP+→MBPP",
+  "splits": {
+    "train_n": 8000,
+    "eval_n": 200,
+    "seeds": {
+      "eval_slice_seed": 20260820,
+      "train_sample_seed": 20260820
+    }
+  },
+  "max_new_tokens": 256,
+  "prompt_style": "BIRD sqlite_master DDL + evidence + question"
+}
