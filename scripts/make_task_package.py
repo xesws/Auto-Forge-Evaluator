@@ -21,7 +21,7 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 TASKS_DIR = ROOT / "tasks"
 CACHE_DIR = ROOT / "data_cache"
-PROTOCOL_PATH = ROOT / "configs" / "protocol_v1.yaml"
+PROTOCOL_PATH = ROOT / "configs" / "protocol_v2.yaml"
 TOP_MANIFEST = "MANIFEST.sha256"
 MAX_DOWNLOAD_BYTES = 500 * 1024 * 1024
 PROMPT_TOKEN_LIMIT = 4000
@@ -37,6 +37,7 @@ SPIDER_ZIP_SHA256 = (
 PINNED_TARBALLS = {
     1: "2f12baddaf5bf2e6869f427dca8d660d27ae0945a25cc0be3fc1b78862d72380",
     2: "794ec0ea78ae6a6a1b526b7682632d378d6bdd439b68e32680ebe00c2c457d48",
+    3: "1deaedcb91d3c98a5c02688f0e83b3a3d124b58a8a5bded570ea2bd2b0f36db0",
 }
 GSM8K_MIN_MEAN_COMPLETION = 100
 

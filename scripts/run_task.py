@@ -26,6 +26,7 @@ from src.data import (  # noqa: E402
     load_task_json,
     load_verifier,
     sha256_file,
+    verify_bird_zip,
     verify_spider_zip,
     verify_task_manifest,
     warn_long_prompts,
@@ -200,6 +201,8 @@ def run(args: argparse.Namespace) -> None:
     protocol = load_protocol(protocol_path)
     task_id = args.task
     task_dir = ROOT / "tasks" / task_id
+    if not (task_dir / "task.json").is_file():
+        raise SystemExit(f"unknown task {task_id}: missing {task_dir / 'task.json'}")
     pver = protocol_ver(protocol_path)
     tver = args.tasks_ver or latest_tasks_ver(ROOT)
     if args.run_dir:
@@ -250,6 +253,8 @@ def run(args: argparse.Namespace) -> None:
         verify_task_manifest(task_dir)
         if task_id == "spider":
             verify_spider_zip(task, ROOT)
+        if task_id == "bird":
+            verify_bird_zip(task, ROOT)
         verifier = load_verifier(task_dir)
         model, tokenizer, model_name, resolved_rev = load_base_model(
             protocol, dry_run=dry_run, device=device
@@ -467,7 +472,7 @@ def main() -> None:
     os.chdir(ROOT)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
     parser = argparse.ArgumentParser(description="Run one task pipeline")
-    parser.add_argument("--task", required=True, choices=("gsm8k", "winogrande", "spider"))
+    parser.add_argument("--task", required=True, help="tasks/<id> directory name")
     parser.add_argument("--protocol", default=str(ROOT / "configs" / "protocol_v2.yaml"))
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--run-dir", default=None)

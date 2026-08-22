@@ -125,6 +125,21 @@ def verify_spider_zip(task: dict[str, Any], repo_root: Path) -> None:
         )
 
 
+def verify_bird_zip(task: dict[str, Any], repo_root: Path) -> None:
+    db = task.get("source", {}).get("database") or {}
+    expected = str(db.get("sha256") or task["source"]["sha256"])
+    local_dir = Path(str(db.get("local_dir") or "data_cache/bird"))
+    zip_path = (repo_root / local_dir / str(db.get("filename") or "bird.zip")).resolve()
+    if not zip_path.is_file():
+        raise SystemExit(
+            f"BIRD zip missing at {zip_path}. sha256={expected}. "
+            "Download box is 1h / 40GB; do not substitute Mini-Dev."
+        )
+    got = sha256_file(zip_path)
+    if got != expected:
+        raise SystemExit(f"BIRD zip sha256 {got} != pinned {expected}. Refuse to run.")
+
+
 def load_verifier(task_dir: Path) -> Any:
     path = task_dir / "verifier.py"
     spec = importlib.util.spec_from_file_location(f"{task_dir.name}_verifier", path)
@@ -138,6 +153,8 @@ def load_verifier(task_dir: Path) -> Any:
 
 
 def completion_from_reference(task_id: str, reference: dict[str, Any]) -> str:
+    if reference.get("completion"):
+        return str(reference["completion"])
     if task_id == "gsm8k":
         solution = reference.get("solution")
         if not solution:
@@ -192,6 +209,25 @@ def format_compliance_for_split(path: Path, task_id: str) -> dict[str, Any]:
         return {
             "n": len(rows),
             "hash": hashed,
+            "last_only": last_only,
+            "none": none,
+            "diverge": diverge,
+        }
+    if task_id == "math":
+        boxed = last_only = none = diverge = 0
+        for row in rows:
+            note = _note(row["samples"][0])
+            if note.get("diverge"):
+                diverge += 1
+            if note.get("boxed_raw") is not None:
+                boxed += 1
+            elif note.get("last_raw") is not None:
+                last_only += 1
+            else:
+                none += 1
+        return {
+            "n": len(rows),
+            "boxed": boxed,
             "last_only": last_only,
             "none": none,
             "diverge": diverge,

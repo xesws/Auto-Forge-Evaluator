@@ -110,6 +110,60 @@ class TestCompletions(unittest.TestCase):
             completion_from_reference("spider", {"query": "SELECT 1"}), "SELECT 1"
         )
 
+    def test_completion_field_wins(self) -> None:
+        self.assertEqual(
+            completion_from_reference("math", {"gold": "1", "completion": "boxed"}),
+            "boxed",
+        )
+
+
+class TestMathFormatCompliance(unittest.TestCase):
+    def test_boxed_channel(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "eval_base_greedy.jsonl"
+            rows = [
+                {
+                    "id": "a",
+                    "samples": [
+                        {
+                            "pass": True,
+                            "parsed": "1",
+                            "note": json.dumps(
+                                {
+                                    "boxed_raw": "1",
+                                    "last_raw": "1",
+                                    "diverge": False,
+                                }
+                            ),
+                        }
+                    ],
+                },
+                {
+                    "id": "b",
+                    "samples": [
+                        {
+                            "pass": True,
+                            "parsed": "2",
+                            "note": json.dumps(
+                                {
+                                    "boxed_raw": None,
+                                    "last_raw": "2",
+                                    "diverge": False,
+                                }
+                            ),
+                        }
+                    ],
+                },
+            ]
+            path.write_text(
+                "".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8"
+            )
+            stats = format_compliance_for_split(path, "math")
+            self.assertEqual(stats["n"], 2)
+            self.assertEqual(stats["boxed"], 1)
+            self.assertEqual(stats["last_only"], 1)
+            self.assertEqual(stats["diverge"], 0)
+
 
 class TestManifestAndJournal(unittest.TestCase):
     def test_gsm8k_manifest_ok(self) -> None:
