@@ -31,7 +31,12 @@ from src.data import (  # noqa: E402
     warn_long_prompts,
 )
 from src.eval_greedy import eval_split  # noqa: E402
-from src.signals import pass_at_1, pass_at_k  # noqa: E402
+from src.signals import (  # noqa: E402
+    PilotLossJsonlHandler,
+    build_signal_vector,
+    pass_at_1,
+    pass_at_k,
+)
 from src.train_lora import (  # noqa: E402
     attach_lora,
     load_adapter,
@@ -306,18 +311,25 @@ def run(args: argparse.Namespace) -> None:
         pilot_rows = sample_rows(train_rows, n_pilot, seeds["pilot_sample_seed"])
         base = reload_base()
         lora_model = attach_lora(base, protocol, dry_run=dry_run)
-        train_lora(
-            lora_model,
-            tokenizer,
-            pilot_rows,
-            task_id,
-            protocol,
-            device,
-            steps=steps_pilot,
-            out_dir=run_dir / "adapters" / "pilot",
-            dry_run=dry_run,
-            seed=seeds["train_seed"],
-        )
+        loss_handler = PilotLossJsonlHandler(run_dir / "pilot_loss.jsonl")
+        train_log = logging.getLogger("forge.train")
+        train_log.addHandler(loss_handler)
+        try:
+            train_lora(
+                lora_model,
+                tokenizer,
+                pilot_rows,
+                task_id,
+                protocol,
+                device,
+                steps=steps_pilot,
+                out_dir=run_dir / "adapters" / "pilot",
+                dry_run=dry_run,
+                seed=seeds["train_seed"],
+            )
+        finally:
+            train_log.removeHandler(loss_handler)
+            loss_handler.close()
         append_journal(run_dir, "S2", "done", n=len(pilot_rows), steps=steps_pilot)
     else:
         LOG.info("skip S2 (already done)")
@@ -433,6 +445,7 @@ def run(args: argparse.Namespace) -> None:
                 seeds,
             ),
             "format_compliance": format_compliance_block(run_dir, task_id),
+            "signals": build_signal_vector(run_dir, task_id=task_id),
             "hashes": hashes,
         }
         dump_json(run_dir / "metrics.json", metrics)
