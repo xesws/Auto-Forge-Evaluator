@@ -1,0 +1,21 @@
+{
+  "task_id": "tydiqa",
+  "source": {
+    "dataset": "tydiqa",
+    "hf_path": "google-research-datasets/tydiqa",
+    "config": "secondary_task",
+    "revision": "da78f23f9119363459acbaf46bf89426ff26c259"
+  },
+  "prior_label": null,
+  "pool_ref": "literature-layer Phase 4; folded MATH500→MATH, MBPP+→MBPP",
+  "splits": {
+    "train_n": 8000,
+    "eval_n": 200,
+    "seeds": {
+      "eval_slice_seed": 20260820,
+      "train_sample_seed": 20260820
+    }
+  },
+  "max_new_tokens": 128,
+  "prompt_style": "TyDiQA-GoldP passage + question; short span answer"
+}

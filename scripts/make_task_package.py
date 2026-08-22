@@ -600,7 +600,12 @@ def pack_tar(task_ids: list[str], version: int) -> None:
     elif PINNED_TARBALLS.get(version) not in (None, new_digest):
         raise SystemExit(f"new {tar_name} hash {new_digest} != pin")
     lines.append("# current unpacked files (match the newest tarball)")
-    for task_id in task_ids:
+    unpacked = sorted(
+        p.name
+        for p in TASKS_DIR.iterdir()
+        if p.is_dir() and (p / "task.json").is_file()
+    )
+    for task_id in unpacked:
         manifest = TASKS_DIR / task_id / "MANIFEST.sha256"
         lines.append(f"{sha256_file(manifest)}  tasks/{task_id}/MANIFEST.sha256")
         for name in _TASK_FILES:

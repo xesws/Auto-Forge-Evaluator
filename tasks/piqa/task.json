@@ -1,0 +1,27 @@
+{
+  "task_id": "piqa",
+  "source": {
+    "dataset": "piqa",
+    "hf_path": null,
+    "url": "https://yonatanbisk.com/piqa/data/",
+    "revision": "f805f9c96518d7b59f2f870d90f712457cda949979469d9fa3fd706ce22e0a1a",
+    "sha256": {
+      "train.jsonl": "f805f9c96518d7b59f2f870d90f712457cda949979469d9fa3fd706ce22e0a1a",
+      "valid.jsonl": "93503cc97c679e459b065c3d13e848282e44b2a25213985bed3e5d458abef72d",
+      "train-labels.lst": "df8ae080c41f02f88e81f6932d425f4b7ee72f433ad552e6a30d45e358e8f8bb",
+      "valid-labels.lst": "b4192dc3a2a0363d9d60ccf79800cbbe2f32ebb17726efdde6970e0b8131bceb"
+    }
+  },
+  "prior_label": null,
+  "pool_ref": "literature-layer Phase 4; folded MATH500→MATH, MBPP+→MBPP",
+  "splits": {
+    "train_n": 8000,
+    "eval_n": 200,
+    "seeds": {
+      "eval_slice_seed": 20260820,
+      "train_sample_seed": 20260820
+    }
+  },
+  "max_new_tokens": 16,
+  "prompt_style": "PIQA goal plus two solutions; last line: 只答选项字母"
+}

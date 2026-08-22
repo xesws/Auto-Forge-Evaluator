@@ -1,0 +1,25 @@
+{
+  "task_id": "task076_splash_correcting_sql_mistake",
+  "source": {
+    "dataset": "natural-instructions",
+    "hf_path": null,
+    "repo": "allenai/natural-instructions",
+    "revision": "55a365637381ce7f3748fa2eac7aef1a113bbb82",
+    "filename": "tasks/task076_splash_correcting_sql_mistake.json",
+    "category": "Text to Code",
+    "source_dataset": "splash"
+  },
+  "prior_label": null,
+  "pool_ref": "superni stratified sample seed 20260822",
+  "splits": {
+    "train_n": 1898,
+    "eval_n": 200,
+    "seeds": {
+      "eval_slice_seed": 20260820,
+      "train_sample_seed": 20260820,
+      "task_sample_seed": 20260822
+    }
+  },
+  "max_new_tokens": 128,
+  "prompt_style": "SuperNI definition + instance input; normalized EM"
+}

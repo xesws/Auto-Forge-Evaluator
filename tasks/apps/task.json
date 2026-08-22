@@ -1,0 +1,22 @@
+{
+  "task_id": "apps",
+  "source": {
+    "dataset": "apps",
+    "hf_path": "codeparrot/apps",
+    "config": null,
+    "revision": "21e74ddf8de1a21436da12e3e653065c5213e9d1",
+    "difficulty": "introductory"
+  },
+  "prior_label": null,
+  "pool_ref": "literature-layer Phase 4; folded MATH500→MATH, MBPP+→MBPP",
+  "splits": {
+    "train_n": 2639,
+    "eval_n": 200,
+    "seeds": {
+      "eval_slice_seed": 20260820,
+      "train_sample_seed": 20260820
+    }
+  },
+  "max_new_tokens": 512,
+  "prompt_style": "APPS introductory only; IO tests in reference.io"
+}

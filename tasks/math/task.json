@@ -1,0 +1,21 @@
+{
+  "task_id": "math",
+  "source": {
+    "dataset": "math",
+    "hf_path": "EleutherAI/hendrycks_math",
+    "config": "all_subjects",
+    "revision": "21a5633873b6a120296cce3e2df9d5550074f4a3"
+  },
+  "prior_label": null,
+  "pool_ref": "literature-layer Phase 4; folded MATH500→MATH, MBPP+→MBPP",
+  "splits": {
+    "train_n": 7500,
+    "eval_n": 200,
+    "seeds": {
+      "eval_slice_seed": 20260820,
+      "train_sample_seed": 20260820
+    }
+  },
+  "max_new_tokens": 512,
+  "prompt_style": "Hendrycks MATH problem; final answer in \\boxed{}"
+}

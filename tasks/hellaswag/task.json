@@ -1,0 +1,21 @@
+{
+  "task_id": "hellaswag",
+  "source": {
+    "dataset": "hellaswag",
+    "hf_path": "Rowan/hellaswag",
+    "config": null,
+    "revision": "218ec52e09a7e7462a5400043bb9a69a41d06b76"
+  },
+  "prior_label": null,
+  "pool_ref": "literature-layer Phase 4; folded MATH500→MATH, MBPP+→MBPP",
+  "splits": {
+    "train_n": 8000,
+    "eval_n": 200,
+    "seeds": {
+      "eval_slice_seed": 20260820,
+      "train_sample_seed": 20260820
+    }
+  },
+  "max_new_tokens": 16,
+  "prompt_style": "HellaSwag context plus 4 endings; last line: 只答选项字母"
+}

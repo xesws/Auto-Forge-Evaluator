@@ -1,0 +1,21 @@
+{
+  "task_id": "arc_easy",
+  "source": {
+    "dataset": "arc_easy",
+    "hf_path": "allenai/ai2_arc",
+    "config": "ARC-Easy",
+    "revision": "210d026faf9955653af8916fad021475a3f00453"
+  },
+  "prior_label": null,
+  "pool_ref": "literature-layer Phase 4; folded MATH500→MATH, MBPP+→MBPP",
+  "splits": {
+    "train_n": 2251,
+    "eval_n": 200,
+    "seeds": {
+      "eval_slice_seed": 20260820,
+      "train_sample_seed": 20260820
+    }
+  },
+  "max_new_tokens": 16,
+  "prompt_style": "question plus N lettered options; last line: 只答选项字母"
+}

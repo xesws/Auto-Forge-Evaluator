@@ -1,0 +1,21 @@
+{
+  "task_id": "mbpp",
+  "source": {
+    "dataset": "mbpp",
+    "hf_path": "google-research-datasets/mbpp",
+    "config": "sanitized",
+    "revision": "4bb6404fdc6cacfda99d4ac4205087b89d32030c"
+  },
+  "prior_label": null,
+  "pool_ref": "literature-layer Phase 4; folded MATH500→MATH, MBPP+→MBPP",
+  "splits": {
+    "train_n": 170,
+    "eval_n": 200,
+    "seeds": {
+      "eval_slice_seed": 20260820,
+      "train_sample_seed": 20260820
+    }
+  },
+  "max_new_tokens": 512,
+  "prompt_style": "MBPP sanitized prompt; official asserts in reference.tests"
+}
