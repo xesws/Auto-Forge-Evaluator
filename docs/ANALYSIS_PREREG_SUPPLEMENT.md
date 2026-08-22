@@ -107,8 +107,8 @@ S2 名单出来之前开量产 run;加主模型特征;改 go 阈值;改协议;�
 - HEAD SHA: `55a365637381ce7f3748fa2eac7aef1a113bbb82`
 - English+规模 存活集: **890** (≥50)
 - 种子 20260822, n=50, `Source[0]` ≤3: 名单 `docs/prod_lists/superni_50.json`
-- 静态名单: `docs/prod_lists/pod_a.txt` (30 = 5 文献含 APPS + 25 SuperNI),
-  `docs/prod_lists/pod_b.txt` (30 = 5 文献含 BIRD + 25 SuperNI)
+- 静态名单(S2 当时): `docs/prod_lists/pod_a.txt` + `pod_b.txt`。
+  **S3 起作废双仓**,见下。
 
 50 个 task id(按 id 排序,与抽样脚本输出一致):
 
@@ -162,3 +162,15 @@ task647_answer_generation
 task649_race_blank_question_generation
 task677_ollie_sentence_answer_generation
 task896_miam_language_classification
+
+---
+
+## Commit S3 执行修订(operator: 单 pod 串行, pod B 取消)
+
+闸门、3h 帽、PARTIAL、确定性节奏(名单第 1 个与每第 10 个全量 200,其余 30 条 seed 20260820) **零变更**。
+
+- 运行名单: `docs/prod_lists/prod_serial.txt` = 文献(无 bird) → SuperNI(原 pod_a 25 再 pod_b 25) → `bird` 队尾。`pod_a.txt` / `pod_b.txt` 仅作历史。
+- `tasks_v4.tar.gz` = **59 包**(9 文献 + 50 SuperNI)。不等 bird。v4 只增不改。bird 若物化成功另出 `tasks_v5` (仅 bird)。
+- 分析 n = 63(含 bird)或 **62**。排除仅当 pod 上 bird 物化自启动起 2h 不绿、且当时尚无任何 bird `metrics.json`。排除句原文:
+  excluded for logistics, before any bird number existed
+- 中期报告: 9 个非 bird 文献 GPU 封盘后交(3 历史 + 9 = 12 行; bird 仍在队尾/并行物化)。13 行只出现在终表且仅当 bird 入样。

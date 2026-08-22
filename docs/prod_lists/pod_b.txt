@@ -1,4 +1,5 @@
-# pod B — literature first, then SuperNI 25. BIRD not with APPS.
+# superseded by docs/prod_lists/prod_serial.txt (pod B cancelled, 2026-08-22)
+# historical pod B — literature first, then SuperNI 25. BIRD not with APPS.
 bird
 arc_easy
 arc_challenge
