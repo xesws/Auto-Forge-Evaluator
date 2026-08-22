@@ -49,4 +49,5 @@ append-only. One dated line per decision, incident, or spec deviation.
 - 2026-08-22: Operator: 远程长任务必须由 agent 自己起 cron/monitor 监督并主动汇报;作业不会自己停来通知。写入 AGENTS.md §5。
 - 2026-08-22: Operator: 结果必须拉回本机并落文件,不能只写在聊天里。scp `runs/forge_runs.tar.gz` sha256 `f34668737c2653e2c221237df5e66b7a2a40a38b0b4772fbfd372e0cbe3b8552` (403MB, 与 pod 一致)。书面报告 `docs/GATE_REPORT.md`。
 - 2026-08-22: Operator: 每次向 operator 汇报必须在 `docs/` 写 report,标明时间与协议/数据/git 版本。写入 AGENTS.md §6 (rev 2)。
+- 2026-08-22: Operator freeze: `protocol_v2` is the production protocol; do not emit `protocol_v3`. Pilot `{n: 10, steps: 100}` kept (recitation is the probe, not a probe bug). Smoke runs `gsm8k__pv2__tv3__20260821-1038`, `winogrande__pv2__tv3__20260821-2105`, `spider__pv2__tv3__20260821-2137` are byte-isomorphic with production and count as production data (3/46 done, 43 remaining). `configs/protocol_v2.yaml` not edited.
 
