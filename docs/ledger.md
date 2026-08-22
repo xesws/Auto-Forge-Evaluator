@@ -48,4 +48,5 @@ append-only. One dated line per decision, incident, or spec deviation.
 - 2026-08-22: Spider S6 sealed 01:07:38 UTC (`spider__pv2__tv3__20260821-2137`). base 0.495, Δ_pilot -0.155, Δ_full +0.150. Five-eye: unparseable 1/200=0.5%; extract_div 0; S2 loss 0.482→9.52e-05; systems complete; greedy rerun mismatch 0. Gate 1 three-task seal complete. Stop for protocol v3 review (pilot 10x100 memorization).
 - 2026-08-22: Operator: 远程长任务必须由 agent 自己起 cron/monitor 监督并主动汇报;作业不会自己停来通知。写入 AGENTS.md §5。
 - 2026-08-22: Operator: 结果必须拉回本机并落文件,不能只写在聊天里。scp `runs/forge_runs.tar.gz` sha256 `f34668737c2653e2c221237df5e66b7a2a40a38b0b4772fbfd372e0cbe3b8552` (403MB, 与 pod 一致)。书面报告 `docs/GATE_REPORT.md`。
+- 2026-08-22: Operator: 每次向 operator 汇报必须在 `docs/` 写 report,标明时间与协议/数据/git 版本。写入 AGENTS.md §6 (rev 2)。
 

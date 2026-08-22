@@ -1,5 +1,5 @@
 # AGENTS.md — Auto-Forge-Evaluator 工作规则
-rev: 1 (2026-08-22)
+rev: 2 (2026-08-22)
 
 本文件对在本仓库工作的所有 agent 生效。与任务 prompt 冲突时,先停下来问 operator,不许自行取舍。
 
@@ -37,3 +37,15 @@ rev: 1 (2026-08-22)
 tmux / SSH 上的训练与评测**不会**在结束时叫醒本会话。agent 不得等 operator 来问「跑完没有」才去看。
 
 启动任何预计超过数分钟的远程作业时,必须同时挂上自己的监督(cron、session monitor、或等价的定时探活):轮询 journal/`metrics.json`/进程是否还在,完成后**主动回报**,失败也主动报。监督挂了要自己补挂。禁止把「等你问我」当成状态机。
+
+## 6. 汇报必须落盘
+
+每次向 operator 汇报进度或结果,不得只写在聊天里。必须同时在 `docs/` 写一份 report 文件并 commit+push。文件头写清:
+
+- 时间 (UTC)
+- git HEAD
+- 协议版本 (`protocol_vN` / pvN)
+- 数据包版本 (`tasks_vN` / tvN)
+- 相关 `runs/` 路径 (若有)
+
+聊天可以摘要,真源是 `docs/` 里那份文件。数字、五眼、墙钟、结论以落盘报告为准。
