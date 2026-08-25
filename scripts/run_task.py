@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import copy
 import json
 import logging
 import random
@@ -50,6 +51,11 @@ LOG = logging.getLogger("forge.run")
 STAGES = ("S0", "S1", "S2", "S3", "S4", "S5", "S6")
 DRY_RUN_STEPS = 2
 DRY_RUN_EVAL_N = 5
+OOM_FALLBACK_TASKS = frozenset(
+    {"tydiqa", "task419_persent_answer_generation"}
+)
+OOM_FALLBACK_BATCH = 1
+OOM_FALLBACK_ACCUM = 16
 
 
 def _now() -> str:
@@ -196,10 +202,27 @@ def stage_eval(
     return metrics
 
 
+def apply_oom_fallback(protocol: dict[str, Any], task_id: str) -> dict[str, Any]:
+    if task_id not in OOM_FALLBACK_TASKS:
+        raise SystemExit(
+            f"--oom-fallback not allowed for {task_id}; "
+            f"allowlist={sorted(OOM_FALLBACK_TASKS)}"
+        )
+    proto = copy.deepcopy(protocol)
+    train = dict(proto["train"])
+    train["per_device_batch"] = OOM_FALLBACK_BATCH
+    train["grad_accum"] = OOM_FALLBACK_ACCUM
+    proto["train"] = train
+    return proto
+
+
 def run(args: argparse.Namespace) -> None:
     protocol_path = Path(args.protocol).resolve()
     protocol = load_protocol(protocol_path)
     task_id = args.task
+    oom_fallback = bool(getattr(args, "oom_fallback", False))
+    if oom_fallback:
+        protocol = apply_oom_fallback(protocol, task_id)
     task_dir = ROOT / "tasks" / task_id
     if not (task_dir / "task.json").is_file():
         raise SystemExit(f"unknown task {task_id}: missing {task_dir / 'task.json'}")
@@ -452,6 +475,7 @@ def run(args: argparse.Namespace) -> None:
             "format_compliance": format_compliance_block(run_dir, task_id),
             "signals": build_signal_vector(run_dir, task_id=task_id),
             "hashes": hashes,
+            "oom_fallback": oom_fallback,
         }
         dump_json(run_dir / "metrics.json", metrics)
         storage.put("metrics.json", (run_dir / "metrics.json").read_bytes())
@@ -477,6 +501,11 @@ def main() -> None:
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--run-dir", default=None)
     parser.add_argument("--tasks-ver", default=None)
+    parser.add_argument(
+        "--oom-fallback",
+        action="store_true",
+        help="tydiqa/task419 only: per_device_batch=1, grad_accum=16 (effective batch 16)",
+    )
     args = parser.parse_args()
     run(args)
 

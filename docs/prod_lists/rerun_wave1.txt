@@ -1,0 +1,6 @@
+# Wave-1 wrap-up reruns. Pod B cancelled serial already drained.
+# Order: bird (tv5 pin + dual-sha checker), then OOM fallback pair, apps 8h last.
+bird
+tydiqa
+task419_persent_answer_generation
+apps
