@@ -2,6 +2,7 @@
 runs/
 data_cache/
 *.tar.gz
+runs/harvest/prelim/
 
 # model weights
 *.bin
