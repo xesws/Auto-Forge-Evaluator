@@ -174,3 +174,32 @@ task896_miam_language_classification
 - 分析 n = 63(含 bird)或 **62**。排除仅当 pod 上 bird 物化自启动起 2h 不绿、且当时尚无任何 bird `metrics.json`。排除句原文:
   excluded for logistics, before any bird number existed
 - 中期报告: 9 个非 bird 文献 GPU 封盘后交(3 历史 + 9 = 12 行; bird 仍在队尾/并行物化)。13 行只出现在终表且仅当 bird 入样。
+
+---
+
+## Commit S4 收尾令(四个补跑 + 预先声明的次级敏感性)
+
+本块写于任何补跑 GPU 启动之前,也写于任何 AUC 被计算之前。协议文件仍为 `protocol_v2.yaml`(不编辑、不出 v3)。有效 batch 仍为 16。
+
+### 补跑条款
+
+1. **bird**: S0 `KeyError: sha256` 是校验代码滞后,不是物流排除。`task.json` 双 sha(`train_zip_sha256` / `dev_zip_sha256`)为既定裁决,`verify_bird_zip` 对齐该字段。`tasks_v5.tar.gz` 不重打(字节不变, sha `cf25de9ca1c889e75e33a5ce484e0374c4881da422401dad7b01ffce5b338983`)。失败目录 `bird__pv2__tv4__20260824-0015` 原地隔离到 `runs/_isolated/`,不删。新 run 必须是 `bird__pv2__tv5__*`。物化 DDL/dev sqlite 若仍在 `data_cache/bird/` 则复用。不 Mini-Dev。bird 墙钟仍 3h。
+2. **apps 8h**: 3h 是运维护栏不是测量语义。`apps` 单独 `WALL_SEC=28800`。第一次 apps 槽 `STATUS=over_budget`、无 `metrics.json`,**调整发生在 apps 任何数字存在之前**。失败目录隔离不删。
+3. **OOM fallback**(仅 `tydiqa` 与 `task419_persent_answer_generation`): run 级覆盖 `per_device_batch=1` × `grad_accum=16`(有效 batch 仍 16,与协议 2×8 相同)。`protocol_v2.yaml` 不改。STATUS 与 `metrics.json` 写 `oom_fallback: true`。其它任务传该旗硬失败。失败目录隔离不删。
+4. **arc_easy**: 保留现有 PARTIAL 数字,不重跑。进入主分析;敏感性 a 剔除。
+
+补跑名单: `docs/prod_lists/rerun_wave1.txt` = bird, tydiqa, task419_persent_answer_generation, apps。
+
+### 预先声明的次级敏感性(主分析一次跑完时计算;此刻冻死)
+
+主分析仍按 `ANALYSIS_PREREG.md`: 任务级 LOTO logistic / 单特征基线 / 纯任务描述对照 / Spearman / 任务级 bootstrap AUC CI。诚实条款不变。
+
+另加:
+
+- **a.** 剔除 `arc_easy`(边界闸门样本)后重算 AUC/Spearman/LOTO。
+- **b.** 剔除指标地板: 有 `metrics.json` 且 `base.pass1 == 0` 且 `full.pass1 == 0` 的行。谓词冻死,名单随封盘而定。当前表中的例子: `task1553_cnn_dailymail_summarization`, `task236_iirc_question_from_passage_answer_generation`, `task455_swag_context_generation`, `task071_abductivenli_answer_generation`。经济 no-go 可以成立,机制是 EM 地板,须与「真学不动」分开报告。
+- **c.** 分组报告(不是新主模型): 选择题簇 `{winogrande, arc_easy, arc_challenge, hellaswag, piqa}`; 数学簇 `{gsm8k, math}`; SuperNI 同源簇 = `docs/prod_lists/superni_50.json` 的 `source` 字段。S1 已声明的「留出整个簇」AUC 仍做,不替换。
+
+主样本(补跑全 ok 时): 55 tv4 STATUS=ok + 3 tv3 + arc_easy(PARTIAL,有 metrics) + 4 补跑 = 63。无 `metrics.json` 的 PARTIAL/over_budget 不进 AUC。
+
+预检: 仅 58 个 STATUS=ok,输出打 `PRELIMINARY — not quotable` 水印,不可引用。
