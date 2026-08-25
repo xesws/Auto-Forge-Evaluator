@@ -125,19 +125,79 @@ def verify_spider_zip(task: dict[str, Any], repo_root: Path) -> None:
         )
 
 
-def verify_bird_zip(task: dict[str, Any], repo_root: Path) -> None:
-    db = task.get("source", {}).get("database") or {}
-    expected = str(db.get("sha256") or task["source"]["sha256"])
-    local_dir = Path(str(db.get("local_dir") or "data_cache/bird"))
-    zip_path = (repo_root / local_dir / str(db.get("filename") or "bird.zip")).resolve()
-    if not zip_path.is_file():
+BIRD_TRAIN_ZIP_NAMES = ("train_databases.zip", "train.zip")
+BIRD_DEV_ZIP_NAMES = ("dev_databases.zip", "dev.zip")
+BIRD_DEV_EXTRACT_NAMES = ("dev_extract", "dev_databases")
+BIRD_TRAIN_EXTRACT_NAMES = ("train_extract", "train_databases")
+
+
+def bird_dual_shas(task: dict[str, Any]) -> tuple[str, str]:
+    """Frozen dual-sha schema. `source.sha256` is not a BIRD field."""
+    source = task.get("source") or {}
+    train_sha = source.get("train_zip_sha256")
+    dev_sha = source.get("dev_zip_sha256")
+    if not train_sha or not dev_sha:
         raise SystemExit(
-            f"BIRD zip missing at {zip_path}. sha256={expected}. "
-            "Download box is 1h / 40GB; do not substitute Mini-Dev."
+            "BIRD task.json must pin source.train_zip_sha256 and "
+            "source.dev_zip_sha256 (dual sha). source.sha256 is not used."
         )
-    got = sha256_file(zip_path)
-    if got != expected:
-        raise SystemExit(f"BIRD zip sha256 {got} != pinned {expected}. Refuse to run.")
+    return str(train_sha), str(dev_sha)
+
+
+def _bird_named(cache: Path, names: tuple[str, ...]) -> Path | None:
+    for name in names:
+        path = cache / name
+        if path.exists():
+            return path
+    return None
+
+
+def verify_bird_zip(task: dict[str, Any], repo_root: Path) -> None:
+    """Check dual zip shas, or reuse materialized DDL/dev sqlite. Never Mini-Dev."""
+    train_sha, dev_sha = bird_dual_shas(task)
+    cache = repo_root / "data_cache" / "bird"
+    train_zip = _bird_named(cache, BIRD_TRAIN_ZIP_NAMES)
+    dev_zip = _bird_named(cache, BIRD_DEV_ZIP_NAMES)
+    if train_zip is not None:
+        got = sha256_file(train_zip)
+        if got != train_sha:
+            raise SystemExit(
+                f"BIRD train zip sha256 {got} != pinned {train_sha}. Refuse to run."
+            )
+    if dev_zip is not None:
+        got = sha256_file(dev_zip)
+        if got != dev_sha:
+            raise SystemExit(
+                f"BIRD dev zip sha256 {got} != pinned {dev_sha}. Refuse to run."
+            )
+    meta_path = cache / "bird_pack_meta.json"
+    if meta_path.is_file():
+        meta = json.loads(meta_path.read_text(encoding="utf-8"))
+        meta_train = meta.get("train_zip_sha256")
+        meta_dev = meta.get("dev_zip_sha256")
+        if meta_train and str(meta_train) != train_sha:
+            raise SystemExit(
+                f"BIRD bird_pack_meta train sha {meta_train} != pinned {train_sha}."
+            )
+        if meta_dev and str(meta_dev) != dev_sha:
+            raise SystemExit(
+                f"BIRD bird_pack_meta dev sha {meta_dev} != pinned {dev_sha}."
+            )
+    dev_extract = _bird_named(cache, BIRD_DEV_EXTRACT_NAMES)
+    sqlite_ok = bool(
+        dev_extract is not None
+        and dev_extract.is_dir()
+        and any(dev_extract.rglob("*.sqlite"))
+    )
+    if sqlite_ok:
+        return
+    if train_zip is not None and dev_zip is not None:
+        return
+    raise SystemExit(
+        "BIRD artifacts missing under data_cache/bird/: need train+dev zips "
+        f"(sha {train_sha[:8]}… / {dev_sha[:8]}…) or dev_extract sqlite. "
+        "Do not substitute Mini-Dev."
+    )
 
 
 def load_verifier(task_dir: Path) -> Any:

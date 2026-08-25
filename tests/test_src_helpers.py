@@ -15,10 +15,14 @@ sys.path.insert(0, str(_ROOT))
 from src.data import (  # noqa: E402
     LocalStorage,
     S3Storage,
+    bird_dual_shas,
     completion_from_reference,
     format_compliance_for_split,
     latest_tasks_ver,
     load_protocol,
+    load_task_json,
+    sha256_file,
+    verify_bird_zip,
     verify_task_manifest,
 )
 
@@ -200,6 +204,90 @@ class TestManifestAndJournal(unittest.TestCase):
             self.assertEqual(run_task_mod.done_stages(run_dir), {"S0"})
             run_task_mod.append_journal(run_dir, "S1", "done")
             self.assertEqual(run_task_mod.done_stages(run_dir), {"S0", "S1"})
+
+
+class TestBirdZip(unittest.TestCase):
+    def test_frozen_task_json_dual_sha(self) -> None:
+        task = load_task_json(_ROOT / "tasks" / "bird")
+        train_sha, dev_sha = bird_dual_shas(task)
+        self.assertEqual(
+            train_sha,
+            "54424b2004cea43f1fd89605b3df41836df3a46bc68ffd5444c6549c112172f3",
+        )
+        self.assertEqual(
+            dev_sha,
+            "cc9d46319bf6cd74c6aef865f91a25993654cb0bf76d807c9cea00eda338dd28",
+        )
+        with self.assertRaises(KeyError):
+            task["source"]["sha256"]
+
+    def test_missing_dual_sha_exits(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            with self.assertRaises(SystemExit):
+                verify_bird_zip({"source": {"sha256": "deadbeef"}}, Path(tmp))
+
+    def test_zip_sha_match_without_extract(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            cache = root / "data_cache" / "bird"
+            cache.mkdir(parents=True)
+            train = cache / "train_databases.zip"
+            dev = cache / "dev_databases.zip"
+            train.write_bytes(b"train-zip-bytes")
+            dev.write_bytes(b"dev-zip-bytes")
+            task = {
+                "source": {
+                    "train_zip_sha256": sha256_file(train),
+                    "dev_zip_sha256": sha256_file(dev),
+                }
+            }
+            verify_bird_zip(task, root)
+
+    def test_zip_sha_mismatch_exits(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            cache = root / "data_cache" / "bird"
+            cache.mkdir(parents=True)
+            train = cache / "train_databases.zip"
+            dev = cache / "dev_databases.zip"
+            train.write_bytes(b"train-zip-bytes")
+            dev.write_bytes(b"dev-zip-bytes")
+            task = {
+                "source": {
+                    "train_zip_sha256": sha256_file(train),
+                    "dev_zip_sha256": "0" * 64,
+                }
+            }
+            with self.assertRaises(SystemExit):
+                verify_bird_zip(task, root)
+
+    def test_extract_reuse_without_zips(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            cache = root / "data_cache" / "bird"
+            db_dir = cache / "dev_extract" / "toy"
+            db_dir.mkdir(parents=True)
+            (db_dir / "toy.sqlite").write_bytes(b"sqlite")
+            task = {
+                "source": {
+                    "train_zip_sha256": "a" * 64,
+                    "dev_zip_sha256": "b" * 64,
+                }
+            }
+            verify_bird_zip(task, root)
+
+    def test_missing_artifacts_exits(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "data_cache" / "bird").mkdir(parents=True)
+            task = {
+                "source": {
+                    "train_zip_sha256": "a" * 64,
+                    "dev_zip_sha256": "b" * 64,
+                }
+            }
+            with self.assertRaises(SystemExit):
+                verify_bird_zip(task, root)
 
 
 if __name__ == "__main__":
