@@ -72,8 +72,137 @@ estimable.
 
 \subsection{Results}
 \label{sec:results}
-\textit{Results to follow.}
-\label{tab:lit}\label{tab:auc}\label{fig:baserate}\label{fig:scatter}
+Four findings, in the frozen abstract order. Every interval below
+is the sealed task-level bootstrap 95\% CI.
+
+\paragraph{Finding 1: forging is the default.}
+Fine-tuning helps far more often than not: 53 of 61 tasks (87\%)
+have $\Delta_{\mathrm{full}}>0$.
+% AR.md L18 (87\% / 86.9\%); L24 (53 go / 8 no-go / n=61)
+Figure~\ref{fig:baserate} is the whole point: the gate
+$\Delta_{\mathrm{full}}>0$ is an easy event on this 1.5B
+protocol. The scarce class is no-go (8 of 61).
+% AR.md L18, L24
+
+\paragraph{Finding 2: pilots rank gain magnitude.}
+Spearman $\rho(\Delta_{\mathrm{pilot}},\Delta_{\mathrm{full}})=0.755$,
+CI $[0.595,0.864]$, which excludes 0.
+% AR.md L16, L48
+Figure~\ref{fig:scatter} is upward-sloping: the probe ranks
+\emph{how much} full fine-tuning helps. GSM8K and MATH sit in the
+third quadrant (both deltas negative) and are labeled.
+Sensitivities (a) drop ARC-Easy and (b) drop EM-floor rows leave
+Spearman intact: $0.756$ $[0.594,0.873]$ and $0.771$
+$[0.608,0.878]$; both CIs exclude 0.
+% AR.md L49--50
+
+\paragraph{Finding 3: the binary gate is not established.}
+The main LOTO logistic has AUC $0.755$ with CI $[0.500,0.929]$.
+% AR.md L15, L36
+The interval covers 0.5. Under the pre-registered honesty clause
+this is a negative result: a 10-example LoRA probe does not
+significantly classify whether full fine-tuning will raise greedy
+pass@1. The same verdict holds in the two pre-declared
+sensitivities, reported next to the main row rather than as
+afterthoughts (Table~\ref{tab:auc}):
+(a)~drop ARC-Easy, $n{=}60$, AUC $0.748$ $[0.487,0.920]$;
+(b)~drop EM-floor rows, $n{=}57$, AUC $0.778$ $[0.411,0.985]$.
+% AR.md L20, L37--38
+Both CIs cover 0.5. Single-feature $\Delta_{\mathrm{pilot}}$ is
+weaker ($0.663$ $[0.480,0.825]$); generation length is $0.818$
+$[0.505,0.986]$ and covers 0.5 at the edge.
+% AR.md L39, L43
+
+\paragraph{Finding 4: description features run below chance.}
+The text-only control, which never sees a probe or a run metric,
+has AUC $0.309$ $[0.045,0.622]$ --- below chance.
+% AR.md L17, L44
+Task size and prompt length do not explain go. Decision-relevant
+information exists only in actually running the pilot.
+
+\begin{figure}[H]
+  \centering
+  \begin{minipage}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=1.55in,keepaspectratio]{base_rate.png}
+    \caption{Label base rate $53/61=86.9\%$.
+      % AR.md L18, L24
+      }
+    \label{fig:baserate}
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=1.55in,keepaspectratio]{calibration_scatter.png}
+    \caption{Pilot vs.\ full gain. GSM8K/MATH labeled in Q3.
+      % AR.md L16, L48 Spearman; L58 gsm8k Δ_full −0.230
+      }
+    \label{fig:scatter}
+  \end{minipage}
+\end{figure}
+
+\begin{table}[H]
+  \caption{Primary LOTO AUC and pre-declared sensitivities.
+    Covering 0.5 is a negative under the honesty clause.}
+  \label{tab:auc}
+  \centering
+  \small
+  \begin{tabular}{l r c c c}
+    \toprule
+    Model & $n$ & AUC & 95\% CI & covers 0.5 \\
+    \midrule
+    Main LOTO logistic
+      & 61 & 0.755 & $[0.500,0.929]$ & yes \\
+      % AR.md L36
+    (a) drop ARC-Easy
+      & 60 & 0.748 & $[0.487,0.920]$ & yes \\
+      % AR.md L37
+    (b) drop EM-floor
+      & 57 & 0.778 & $[0.411,0.985]$ & yes \\
+      % AR.md L38
+    Text-only control
+      & 61 & 0.309 & $[0.045,0.622]$ & yes (below chance) \\
+      % AR.md L44
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Table~\ref{tab:lit} reports the 11 literature-layer tasks that
+are in the sealed sample. BIRD and APPS are out
+(logistics exclude, no label).
+% AR.md L27--30
+
+\begin{table}[H]
+  \caption{Literature-layer tasks in $n{=}61$. Display rounding
+    matches the sealed reports; no new analysis.}
+    % Row sources: GATE_REPORT L11--13 (gsm8k/wino/spider);
+    % REPORT\_20260824T0024Z L56--63 (math..piqa);
+    % REPORT\_20260825T0851Z L16--18 (tydiqa);
+    % gsm8k $\Delta_{\mathrm{full}}$ also AR.md L58;
+    % tydiqa $\Delta_{\mathrm{full}}$ also AR.md L61;
+    % JSON companion: ANALYSIS\_RESULTS.json main\_bundle.delta\_*.
+  \label{tab:lit}
+  \centering
+  \scriptsize
+  \begin{tabular}{l r r r}
+    \toprule
+    Task & base & $\Delta_{\mathrm{pilot}}$ & $\Delta_{\mathrm{full}}$ \\
+    \midrule
+    GSM8K         & 0.690 & $-0.335$ & $-0.230$ \\ % GATE L11; AR.md L58
+    WinoGrande    & 0.560 & $-0.055$ & $+0.190$ \\ % GATE L12
+    Spider        & 0.495 & $-0.155$ & $+0.150$ \\ % GATE L13
+    MATH          & 0.355 & $-0.155$ & $-0.160$ \\ % REPORT_0024Z L56
+    MBPP          & 0.055 & $-0.030$ & $+0.000$ \\ % L57
+    DROP          & 0.055 & $+0.275$ & $+0.535$ \\ % L58
+    TyDiQA        & 0.170 & $+0.260$ & $+0.530$ \\ % REPORT_0851Z L16--18; AR.md L61
+    ARC-Easy      & 0.850 & $-0.120$ & $+0.035$ \\ % REPORT_0024Z L60; AR.md L26 PARTIAL
+    ARC-Challenge & 0.780 & $-0.090$ & $+0.020$ \\ % L61
+    HellaSwag     & 0.650 & $-0.140$ & $+0.180$ \\ % L62
+    PIQA          & 0.765 & $-0.015$ & $+0.065$ \\ % L63
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\FloatBarrier
 
 \subsection{Discussion}
 \label{sec:discussion}
