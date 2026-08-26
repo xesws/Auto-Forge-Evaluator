@@ -30,3 +30,12 @@ venv/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
+
+# paper build crumbs (keep main.pdf)
+paper/*.aux
+paper/*.log
+paper/*.out
+paper/*.fls
+paper/*.fdb_latexmk
+paper/*.synctex.gz
+paper/*.toc

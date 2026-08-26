@@ -1,0 +1,84 @@
+\documentclass{article}
+
+\usepackage[dblblindworkshop]{neurips_2026}
+
+\workshoptitle{Workshop for Autonomous Machine Learning Research}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{booktabs}
+\usepackage{amsfonts}
+\usepackage{nicefrac}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage{graphicx}
+
+\title{To Forge or Not to Forge: Predicting Task-Level Fine-Tuning Gains from Ten-Example Pilots}
+
+\author{%
+  Anonymous Author(s) \\
+  Anonymous Institution \\
+}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Fine-tuning a small specialist model is the default path to
+cheap task-specific capability, yet the upstream decision --- is
+this task worth fine-tuning at all? --- is still made by intuition
+or by paying for the full training run. We ask whether ten
+labeled examples can answer it in advance. Under a single frozen
+protocol (Qwen2.5-1.5B-Instruct, fixed LoRA recipe and budgets,
+greedy decoding, execution-based verifiers), we measure 61 tasks
+--- 11 anchored in the small-model post-training literature and 50
+drawn by a pre-registered filter from Super-NaturalInstructions ---
+pairing a ten-example pilot with a full fine-tune whose measured
+gain serves as ground truth. All analyses were pre-registered.
+We find: (1) fine-tuning helps far more often than not --- 53 of
+61 tasks (87\%) show positive full-training gains, making ``forge''
+the empirical default in this regime; (2) pilot signals
+significantly rank gain magnitude (Spearman 0.755, 95\% CI
+[0.60, 0.86]), enabling budget allocation by ranking; (3) the
+pre-registered binary go/no-go endpoint is not established
+(leave-one-task-out AUC 0.755, bootstrap CI [0.50, 0.93]), a
+power limit rooted in the empirical scarcity of no-go tasks
+itself; and (4) description-only features predict below chance
+(AUC 0.31) --- the decision-relevant information exists only in
+actually running the pilot. We characterize the no-go tail,
+including negative transfer on heavily post-trained bases
+(GSM8K $-0.23$ despite in-domain training), and release the
+benchmark, protocol, and all sealed artifacts.
+These sealed measurements and pre-registered analyses were produced by an autonomous discover-pilot-decide-train-validate system; without that system's contribution the 61-task ground-truth table would not exist.
+\end{abstract}
+
+\noindent\textbf{Keywords:} fine-tuning, evaluation, small language models
+
+\input{part1}
+\input{part2}
+\input{part3}
+
+\clearpage
+\appendix
+
+\section{Reproducibility Statement}
+\textit{Stub.}
+
+\section{Disclosure Statement}
+
+\paragraph{Agent(s) / model(s) used}
+
+
+\begin{itemize}
+  \item[$\square$] A human author has curated this work and verified every claim,
+    figure, methodology detail, and reference.
+  \item[$\square$] A human author takes full accountability for the submission as
+    a human-authored, human-verified artifact.
+\end{itemize}
+
+\section{References}
+
+\end{document}
