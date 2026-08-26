@@ -206,4 +206,71 @@ are in the sealed sample. BIRD and APPS are out
 
 \subsection{Discussion}
 \label{sec:discussion}
-\textit{Discussion to follow.}
+The upstream decision --- is this task worth fine-tuning? --- is
+still made by intuition or by paying for the full run. A cheap,
+execution-based probe that ranked tasks would change how
+small-model post-training budgets are allocated. The measurements
+above show that such a probe exists as a ranker and does not
+exist as a binary gate, in a regime where forging is already the
+default.
+
+The honest reading is split. If the operational question is
+\emph{whether} to run full fine-tuning, the 10-shot probe is not
+a significant classifier (Finding~3). If the question is \emph{how
+large} the full-training gain will be, the same probe ranks
+tasks (Finding~2). Those two sentences should not be collapsed:
+the probe is a ranker, not a stoplight.
+
+Finding~1 is the mechanism of Finding~3, not a nuisance. With
+eight negatives, AUC is under-powered for a hard gate.
+% AR.md L24 8 no-go
+A classifier that always predicts go is already strong in
+accuracy and useless in ROC. Missing negatives include two
+logistics exclusions: BIRD never received metrics; APPS never
+received $\Delta_{\mathrm{full}}$.
+% AR.md L27--30
+APPS reached base pass@1 $0.0$ / pass@8 $0.005$ before the
+full-training OOM; that floor is a limitations footnote, not a
+sample row.
+% AR.md L30; REPORT_20260825T1312Z / S5 footnote (not a sealed Δ_full)
+
+\paragraph{Failure modes in the sample.}
+Format overwrite: GSM8K $\Delta_{\mathrm{full}}=-0.230$ despite
+in-domain training.
+% AR.md L58
+The base already emits the dataset's \texttt{\#\#\#\#} format;
+full training saturates format while reasoning degrades. MATH
+sits in the same quadrant
+($\Delta_{\mathrm{pilot}}=-0.155$, $\Delta_{\mathrm{full}}=-0.160$).
+% REPORT_20260824T0024Z L56; AR.md L58 names gsm8k/math as the pair
+Exact-match floor: four SuperNI rows have $\Delta_{\mathrm{full}}=0$
+because the matcher never hits
+(\texttt{task071}, \texttt{task1553}, \texttt{task236},
+\texttt{task455});
+% AR.md L52, L59
+sensitivity (b) drops them and the negative gate remains.
+% AR.md L38
+OOM disclosure: TyDiQA and task419 are in-sample only because of
+the $1{\times}16$ fallback (effective batch still 16).
+% AR.md L61
+WinoGrande, often treated as a weak-gain control in this size
+class, shows $\Delta_{\mathrm{full}}=+0.190$ here --- a reverse
+relative to that prior, not a new endpoint.
+% GATE_REPORT L12; REPORT_20260824T0024Z L121
+
+\paragraph{Related work (lite).}
+Rectified Scaling Law~\citep{lin2024rectified} predicts
+pretraining loss versus compute in order to choose which model
+to fine-tune; we instead ask, for a fixed small model, which
+\emph{tasks} are worth fine-tuning at all. The Fine-Tuning
+Trap~\citep{nair2026trap} documents negative transfer of PEFT on
+sub-1B mathematical reasoning; our GSM8K/MATH third-quadrant
+points are a task-level counterpart under a frozen LoRA recipe.
+Super-NaturalInstructions~\citep{wang2022superni} supplies the
+50-task slice; CodeS~\citep{codes} is the text-to-SQL line that
+motivates Spider as an anchor.
+
+We do not add features, change the go threshold, or reopen BIRD
+or APPS. Cluster AUCs stay unreported as estimates: the choice
+cluster is all-go; the math cluster has $n{=}2$.
+% AR.md L54
