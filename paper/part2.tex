@@ -1,76 +1,352 @@
 \section{System Design and Meta-Analysis}
 \label{sec:part2}
-% CFP: human-authored companion. Narrative is operator-owned.
-% This file holds CFP subsection slots plus a material pack.
-% No Part~2 prose is written here.
+% CFP: human-authored companion. This draft is agent-written from
+% the ledger and sealed reports; operator curates before submission.
+% Every factual sentence has a source comment. No invented events.
 
 \subsection{Agent and Harness}
-\begin{center}\texttt{[OPERATOR PROSE HERE]}\end{center}
+\label{p2:harness}
+We ran the study with two coupled pieces: a frozen Python harness
+that executes one task from package load through a sealed
+\texttt{metrics.json}, and an LLM coding agent that packed those
+tasks, drove the remote GPU worker, diagnosed failures, ran the
+pre-registered analysis, and drafted this manuscript.
+% ledger 2026-08-21 Phases 1--3; 2026-08-22 freeze and pre-reg;
+% 2026-08-22--24 serial queue; 2026-08-25 analysis seal
+The experimental model inside the harness is Qwen2.5-1.5B-Instruct
+at a pinned revision; the coding agent's weights are omitted here
+for double-blind review and are named in the disclosure for the
+chairs.
+% protocol_v2.yaml L1--2
 
-\subsection{Tools}
-\begin{center}\texttt{[OPERATOR PROSE HERE]}\end{center}
+The harness is a single-task state machine
+S0--S6: load and hash-check the package; greedy-evaluate the
+unadapted base; train a 10-example LoRA probe; evaluate the probe;
+train the full LoRA; evaluate the full adapter; seal metrics
+(systems block included).
+% MANUAL_v1.md §6 S0--S6
+Resume is journal-boundary only: a killed full-training stage
+restarts at S4 with S0--S3 kept.
+% ledger 2026-08-21 spider SIGTERM at S4 start; resumed from that boundary
+The agent never edits the protocol file. It may add scripts,
+isolate a failed run directory, or stop and write a report.
 
-\subsection{Research Loop}
-\begin{center}\texttt{[OPERATOR PROSE HERE]}\end{center}
+Figure~\ref{fig:arch} is the loop that produced the sealed
+$n{=}61$ table: a task factory writes frozen packages; a serial
+queue feeds the S0--S6 runner; gates mark PARTIAL or
+\texttt{over\_budget} without inventing labels; incremental then
+full harvest brings artifacts back; a pre-registered script seals
+the analysis.
+% AR.md L24; ledger 2026-08-24 drain; 2026-08-25 --final
 
-\subsection{Human Interventions}
-\begin{center}\texttt{[OPERATOR PROSE HERE]}\end{center}
-
-\subsection{Verification}
-\begin{center}\texttt{[OPERATOR PROSE HERE]}\end{center}
-
-\subsection{Significance of result}
-\begin{center}\texttt{[OPERATOR PROSE HERE]}\end{center}
-
-\subsection{Interpretability}
-\begin{center}\texttt{[OPERATOR PROSE HERE]}\end{center}
-
-\subsection{Limitations}
-\begin{center}\texttt{[OPERATOR PROSE HERE]}\end{center}
-
-\subsubsection*{Material pack}
-\label{sec:part2-materials}
-% Lists and one figure only. Not narrative. Operator draws prose
-% from paper/materials/*.md. Numbers that appear below are
-% already sealed; no new AUC.
-
-\paragraph{Intervention-point checklist.}
-\begin{enumerate}
-  \item Protocol freeze at v2 (no v3). Pilot $10{\times}100$ kept as the probe.
-  \item Sample-frame correction: pool rows $\neq$ tasks; intended $13$ literature $+50$ SuperNI $=63$.
-  \item Dual-worker plan cancelled; one serial queue of 60.
-  \item BIRD packed as a separate later package; Mini-Dev never used.
-  \item False-negative remote-shell diagnosis (tool layer, not host); production started after the correction.
-  \item APPS wall: 3h then 8h ops fence, declared before any APPS label.
-  \item BIRD checker aligned to dual zip-sha fields (not a single \texttt{sha256} key).
-  \item Failed run directories isolated, not deleted.
-  \item OOM fallback $1{\times}16$ only for TyDiQA and SuperNI task419; effective batch unchanged.
-  \item Campaign close: $n{=}61$; BIRD/APPS logistics exclude before any label.
-    % AR.md L24, L27--30
-\end{enumerate}
-
-\paragraph{System-number archive.}
-\begin{itemize}
-  \item Sealed sample $n{=}61$ ($53$ go / $8$ no-go).
-    % AR.md L24
-  \item Serial queue $60/60$ completed; two literature-layer tasks produced no label.
-  \item Protocol yaml never edited after freeze.
-  \item Disclosed in-sample exceptions: ARC-Easy PARTIAL; TyDiQA/task419 OOM fallback
-    ($\Delta_{\mathrm{full}}+0.530$ / $+0.505$).
-    % AR.md L26, L61
-  \item APPS S1 base pass@1 $0.0$ / pass@8 $0.005$: limitations footnote, not a row.
-    % AR.md L30
-  \item Total GPU-hours: not computed; do not invent.
-\end{itemize}
-
-\paragraph{Architecture (material figure).}
-Figure~\ref{fig:arch} is a schematic of the factory--queue--gates--harvest loop used to produce the sealed table. Caption is factual, not Part~2 narrative.
-
-\begin{figure}[h]
+\begin{figure}[H]
   \centering
   \input{figures/architecture}
-  \caption{Factory $\rightarrow$ serial queue $\rightarrow$ per-task
-    S0--S6 runner $\rightarrow$ gates $\rightarrow$ harvest $\rightarrow$
-    sealed analysis. Dashed boxes: human intervention points.}
+  \caption{Factory $\rightarrow$ frozen packages $\rightarrow$
+    serial queue $\rightarrow$ S0--S6 runner $\rightarrow$ gates
+    $\rightarrow$ harvest $\rightarrow$ sealed analysis. Dashed
+    box: human intervention points (freeze, fence, fallback, close).}
   \label{fig:arch}
 \end{figure}
+
+\subsection{Tools}
+\label{p2:tools}
+Compute was one 48GB-class GPU worker and one serial queue.
+% GATE_REPORT systems block: NVIDIA A40, 48GB; do not name vendor/host
+The worker ran the harness under a terminal multiplexer; the agent
+supervised it with scheduled probes of \texttt{journal.jsonl},
+\texttt{STATUS}, and \texttt{metrics.json}, because a remote job
+does not wake the session when it ends.
+% AGENTS.md §5; ledger 2026-08-22 operator rule
+Local tools were git on a single mainline (small commits, no
+force-push), an append-only ledger, pytest, and SHA-256 manifests.
+% AGENTS.md §1, §3
+Execution-based verifiers (GSM8K, WinoGrande, Spider, later
+MATH/MBPP/DROP/TyDiQA/ARC/HellaSwag/PIQA and a SuperNI exact-match
+family) expose a uniform
+\texttt{verify(output, reference) -> \{pass, parsed, note\}};
+unparseable is \texttt{parsed is None}, never a silent wrong.
+% MANUAL_v1.md §4--5
+Each verifier has mutation tests: gold must pass, a known-wrong
+answer must fail, format variants of a correct answer must pass,
+garbage must unparse.
+% MANUAL_v1.md §5; tests/test_*_verifier.py
+GSM8K accepts \texttt{\#\#\#\# 1,000} as 1000 and rejects a
+hash without a number; WinoGrande will not treat the bare English
+article ``a'' as choice A; Spider compares execution multisets and
+treats a 30\,s timeout as fail with the exception type in
+\texttt{note}.
+% tests/test_gsm8k_verifier.py; test_winogrande_verifier.py
+% (bare article); MANUAL_v1.md §5 Spider 30s
+The factory pins source revisions at pack time (dataset SHAs in
+the package \texttt{task.json}) and writes a per-package
+\texttt{MANIFEST.sha256}. SuperNI clones were frozen at
+\texttt{55a36563}$\ldots$ before ids were committed; English+size
+filter left 890 surviving tasks, then the seed-20260822 draw of 50
+with a \texttt{Source[0]} cap of 3.
+% ANALYSIS_PREREG_SUPPLEMENT.md L104--108; ledger 2026-08-22 S2
+Code execution is a subprocess with a 10s cap, no network, and a
+2\,GiB virtual-memory limit.
+% ANALYSIS_PREREG_SUPPLEMENT.md L62--64
+
+\subsection{Research Loop}
+\label{p2:loop}
+The loop was not an open-ended search over architectures. It was
+discover (pack a frozen task), pilot (10-shot LoRA), decide (record
+$\Delta_{\mathrm{pilot}}$ as a signal, not a gate), train (full
+LoRA), validate (greedy pass@1), then stop. The scientific
+hypothesis --- whether that probe classifies
+$\mathrm{go}\Leftrightarrow\Delta_{\mathrm{full}}>0$ --- was
+written down before the remaining production runs.
+% ANALYSIS_PREREG.md L1--41; ledger 2026-08-22 pre-reg
+
+Protocol freeze came first. After three smoke runs the operator
+stopped a proposed \texttt{protocol\_v3}: the pilot
+$10{\times}100$ reaching loss $\sim 10^{-5}$ is recitation, and
+recitation is the probe, not a bug. \texttt{protocol\_v2.yaml} was
+never edited after that freeze; any later exception is a run-level
+flag, not a silent yaml change.
+% ledger 2026-08-22 freeze; GATE_REPORT L45; AR.md header
+
+Sample-frame correction came next. An earlier count treated 46
+retestable \emph{pool rows} as 46 tasks. Deduped literature-layer
+tasks are 13 (3 already sealed, 10 new) plus 50 SuperNI tasks
+drawn by a pre-registered English-and-size filter (seed 20260822,
+\texttt{Source[0]}$\le 3$). Intended $n{=}63$. A second GPU worker
+was cancelled; the 60 new slots ran as one serial list.
+% ledger 2026-08-22; ANALYSIS_PREREG_SUPPLEMENT.md S1--S3
+BIRD was packed later as its own package; the 59-task package did
+not wait. Mini-Dev was never used.
+% ledger 2026-08-22 tasks_v4=59, tasks_v5 bird-only; Mini-Dev skipped
+
+The serial queue started 2026-08-22T09:34Z and drained 60/60 at
+2026-08-24T00:22Z on that one GPU (~39\,h wall).
+% ledger 2026-08-22 start; 2026-08-24 drain
+Of those 60 slots, 55 sealed \texttt{STATUS=ok} on the 59-task
+package; the rest were PARTIAL or \texttt{over\_budget} (TyDiQA
+and task419 S4 OOM, ARC-Easy unparseable at 5\% with metrics,
+BIRD S0 field error, APPS 3\,h S1-only). Three earlier smoke
+runs (GSM8K, WinoGrande, Spider) already counted as production
+data under the freeze.
+% ledger 2026-08-24 task896 55/59; REPORT_20260824T0024Z PARTIAL list;
+% ledger 2026-08-22 freeze smoke=production
+A per-task 3\,h wall marks \texttt{over\_budget}; gates run after
+S6 and do not block the next task. Determinism uses a 200-row
+rerun on list items 1 and every 10th, otherwise 30 rows.
+% ANALYSIS_PREREG_SUPPLEMENT.md L46--48
+Incremental harvest pulled a 10-directory tar after every tenth
+GPU completion (adapters omitted). Failed directories are isolated,
+not deleted.
+% ANALYSIS_PREREG_SUPPLEMENT.md L39--49; ledger S4 isolate
+A four-task rerun wave (declared before any AUC) then ran
+2026-08-25T06:19Z--13:11Z: BIRD dual-sha checker, TyDiQA and
+SuperNI task419 with a disclosed $1{\times}16$ OOM fallback
+(effective batch still 16), APPS at an 8\,h ops fence.
+% ledger 2026-08-24 S4 wrap-up before GPU; 2026-08-25 Wave-1
+Analysis was sealed the same day at $n{=}61$ under the honesty
+clause. No AUC was computed until that script ran.
+% AR.md header; ANALYSIS_PREREG.md L36--41
+
+\subsection{Human Interventions}
+\label{p2:interventions}
+Human interventions were discrete, dated, and written into the
+ledger before the next GPU step. We list the ones that changed
+what the sealed table contains, including the agent's own
+misreports.
+
+\paragraph{False-negative connectivity.}
+The agent reported that the GPU worker was unreachable. A
+follow-up over an already-open multiplexed session returned
+\texttt{ok}. The cause was the agent's tool layer refusing the
+remote-shell call, not a host or authentication failure.
+Production started after that correction, not after a
+re-provision.
+% ledger 2026-08-22 Misreport cannot SSH; mux was live
+That is an agent error in the log, not a cluster outage.
+
+\paragraph{Procedure slip, then a STOP.}
+Gate~1 (WinoGrande, then Spider) was started before Gate~0's
+five-eye table had been accepted. The operator halted Spider at
+the S4 boundary (SIGTERM; S0--S3 kept), kept the WinoGrande
+directory, and only then passed Gate~0.
+% ledger 2026-08-21 暂判不通过; spider SIGTERM
+Spider later resumed from that journal boundary and sealed.
+% ledger 2026-08-22 Spider S6
+The STOP did what a comment in chat cannot: it prevented a
+protocol decision from being made on a moving GPU.
+
+\paragraph{Format overwrite, not EOS.}
+GSM8K returned $\Delta_{\mathrm{full}}=-0.230$ with unparseable
+$0/200$ and a deterministic greedy rerun.
+% GATE_REPORT L11, L21, L26; AR.md L58
+A truncation/EOS reading does not fit those numbers. Base
+format-compliance was \texttt{\#\#\#\#} 58 / last-number 142 /
+none 0; after the probe and after full training the slice was
+\texttt{\#\#\#\#} 200/200.
+% GATE_REPORT L32
+The operator's Gate~0 ruling --- format overwrite with reasoning
+collapse --- is the one we keep. The derived
+\texttt{format\_compliance} field was backfilled into metrics and
+did not bump the protocol version.
+% ledger 2026-08-21 Gate 0 pass; format_compliance 不升协议
+
+\paragraph{Schema lag on BIRD, failed closed.}
+The first BIRD slot died in S0 on \texttt{KeyError: sha256}: the
+checker wanted a single \texttt{source.sha256}; the package stored
+\texttt{train\_zip\_sha256} and \texttt{dev\_zip\_sha256}. No
+metrics were written. The directory was isolated. The checker was
+aligned to the dual-sha fields; the bird-only package was not
+rebuilt. A later slot passed S0, then died of CUDA OOM at the
+first probe backward pass (S1 pass@1 $0.085$ / pass@8 $0.23$;
+still no \texttt{metrics.json}).
+% ledger 2026-08-24 bird tv4 KeyError; 2026-08-25 bird tv5 S2 OOM
+We did not invent a SQL label to close the queue.
+
+\paragraph{Wall as an ops fence, not a measurement.}
+APPS hit the 3\,h cap in S1 with no metrics
+(\texttt{over\_budget}). The 8\,h rerun was declared before any
+APPS number existed. It finished S1 at base pass@1 $0.0$ /
+pass@8 $0.005$ and died of CUDA OOM at full-training step 22/495
+--- still no $\Delta_{\mathrm{full}}$.
+% ledger 2026-08-22 apps over_budget; S4 wrap-up 8h; AR.md L30
+The floor is a missing-negative footnote, not a row.
+
+\paragraph{OOM fallback, two tasks only.}
+TyDiQA and SuperNI task419 died of CUDA OOM in S4 on the first
+pass. A run-level $1{\times}16$ fallback (effective batch 16, yaml
+untouched, flag in STATUS and metrics) was declared before those
+reruns, and only those two task ids may carry the flag. Both
+resealed: $\Delta_{\mathrm{full}}+0.530$ / $+0.505$.
+% AR.md L61; ledger S4; Wave-1 reports
+ARC-Easy stayed PARTIAL (unparseable $10/200=5\%$, metrics
+present) and entered the main sample; sensitivity (a) drops it.
+% AR.md L26, L37
+
+\paragraph{Campaign close.}
+BIRD and APPS stay out:
+\texttt{excluded for logistics, before any label existed}.
+% AR.md L27--30
+The go threshold, the protocol file, and the honesty clause were
+not reopened after seeing AUC.
+
+\paragraph{What the operator always owns.}
+The following decisions never moved to the agent, even when the
+agent drafted the patch: freeze or not freeze the protocol file;
+keep or replace the $10{\times}100$ probe; the honesty clause and
+the go threshold; whether Mini-Dev may substitute for BIRD; the
+exact exclude sentence and the rule that it may be used only
+before a label exists; whether a PARTIAL with metrics (ARC-Easy)
+enters the sample; whether the pod may be killed; the disclosure
+boxes in this PDF.
+% ledger freeze; pre-reg; Mini-Dev skipped; S5 exclude; ARC-Easy
+% keep PARTIAL; 2026-08-25 pod 可杀 is operator hand-kill
+The agent owns packing, the unattended queue, harvest SHA checks,
+five-eye tables, and writing \texttt{PARTIAL} instead of a guessed
+$\Delta$. When those two columns mixed --- the SSH misreport, Gate~1
+started early --- the log names the mix rather than rewriting it.
+
+\subsection{Verification}
+\label{p2:verify}
+Four checks sit under every sealed row, and a fifth sits under the
+paper's numbers.
+
+Gates (automatic, do not block the queue): base unparseable
+$<5\%$; pilot loss must fall; the systems block must be complete
+(torch, transformers, CUDA, driver, GPU name, base revision,
+seeds, \texttt{dry\_run=false}); a greedy rerun of the unadapted
+base must match per-id \texttt{pass} (full 200 on list items 1 and
+every 10th; otherwise 30 rows; seed 20260820). Failure writes
+\texttt{STATUS=PARTIAL}.
+% ANALYSIS_PREREG_SUPPLEMENT.md L39--48; GATE_REPORT L18--26
+Smoke three-task five-eye was all green (GSM8K/WinoGrande
+unparseable $0/200$, Spider $1/200=0.5\%$; rerun mismatch 0).
+% GATE_REPORT L18--28
+
+Packages carry \texttt{MANIFEST.sha256}. Incremental harvest tars
+omit adapters and were SHA-checked against the worker; the full
+archive (adapters and isolated dirs included) has sha256
+\texttt{71309f7c}$\ldots$\texttt{f4028f7d}.
+% ledger 2026-08-25 full tar
+Figures in Part~1 are redrawn from a frozen plot payload, not from
+a second analysis.
+
+The analysis contract --- go iff $\Delta_{\mathrm{full}}>0$,
+task-level LOTO logistic, Spearman on the two deltas, text-only
+control, bootstrap 95\% CI, ``AUC non-significant $=$ publish
+negative'' --- was committed before the remaining 60 GPU slots.
+% ANALYSIS_PREREG.md; ledger 2026-08-22
+The coding agent drafted this Part~2 from that ledger and those
+reports. A human author has to walk every claim before the
+disclosure boxes below can be ticked; they are unchecked in this
+draft.
+
+\subsection{Significance of result}
+\label{p2:signif}
+The qualifying result is a 61-row, execution-based ground-truth
+table that did not exist before the harness ran, plus a
+pre-registered reading of it: forging is the default (53/61),
+the 10-shot probe ranks gain, and the binary gate is not
+established.
+% AR.md L15--24
+Small-model post-training spends real GPU time on tasks that
+look like GSM8K (negative transfer) and on tasks that look
+unimportant until a probe is actually run (description-only AUC
+below chance). A ranker that is honest about not being a
+stoplight is usable for budget allocation; a non-significant AUC
+hidden by post-hoc features would not be.
+% AR.md L17, L44, L58
+The process claim, for this workshop, is narrower: a frozen
+protocol, a pre-registered honesty clause, and fail-closed
+logistics were enough to publish that negative gate rather than
+wait for more no-go tasks.
+
+\subsection{Interpretability}
+\label{p2:interp}
+Protocol files, task packages, and run directories are
+append-only versioned (\texttt{protocol\_v2}, \texttt{tasks\_v3}
+leftover, \texttt{tasks\_v4} 59-pack, \texttt{tasks\_v5}
+bird-only). Old versions remain on disk; a run directory names
+the protocol and package it consumed.
+% AGENTS.md §2; ledger pack lines
+The ledger is append-only. Journal lines are stage-boundary
+events; Spider is the existence proof that resume does not replay
+S0--S3.
+% ledger 2026-08-21/22 spider
+Harvest is two-tier by design: incremental tars for monitoring
+(no adapters), one full tar for audit. Isolated failed dirs live
+inside that tar.
+A sealed run directory is meant to be readable without the agent:
+\texttt{task.json} and the package manifest, \texttt{journal.jsonl}
+stage boundaries, \texttt{eval\_*\_greedy.jsonl} for every labelled
+slice, \texttt{STATUS}, and \texttt{metrics.json} with the systems
+block (torch / transformers / CUDA / driver / GPU name / pinned
+base revision / seeds / \texttt{dry\_run=false}).
+% GATE_REPORT L25 systems; MANUAL_v1.md §6 S6
+If that bundle is missing, the row is not a label. That is why
+BIRD and APPS are logistics excludes rather than no-go.
+
+\subsection{Limitations}
+\label{p2:lim}
+The harness measures one base model, one LoRA recipe, greedy
+pass@1, and a $\Delta_{\mathrm{full}}>0$ gate that is empirically
+easy (8 no-go out of 61).
+% AR.md L24
+Cluster AUCs were pre-declared and are not estimable.
+% AR.md L54
+BIRD and APPS produced no label; we do not read that as ``this
+model cannot learn SQL or competition-style code.''
+% AR.md L27--30
+Campaign GPU-hours were not summed and are not invented here.
+We report only walls that sit in sealed reports: smoke-task
+S0$\to$S6 of GSM8K $\approx 2.16$\,h, WinoGrande $\approx 0.51$\,h,
+Spider $\approx 2.22$\,h effective (plus a killed half S4
+$\approx 0.9$\,h not counted in the 2.22); a TDP-times-wall
+upper bound of $\approx 1.5$\,kWh on that three-task block, not a
+metered reading; serial production $\approx 39$\,h wall for 60
+slots; Wave-1 TyDiQA $\approx 92$\,min and task419 $\approx 53$\,min
+inside the 3\,h cap.
+% GATE_REPORT L38--41; ledger 2026-08-22 start / 2026-08-24 drain;
+% REPORT_20260825T0851Z ~92 min; REPORT_20260825T0951Z ~53 min
+The agent's connectivity misreport and the Gate~1-before-Gate~0
+start are in the log because hiding them would make the STOP
+discipline look cleaner than it was.
