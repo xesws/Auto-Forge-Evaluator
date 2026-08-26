@@ -1,0 +1,61 @@
+\documentclass{article}
+
+\usepackage[dblblindworkshop]{neurips_2026}
+\workshoptitle{Workshop for Autonomous Machine Learning Research}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{booktabs}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{microtype}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{graphicx}
+
+\title{Supplementary Material: To Forge or Not to Forge}
+
+\author{%
+  Anonymous Author(s) \\
+  Anonymous Institution \\
+}
+
+\begin{document}
+\maketitle
+
+\noindent This archive accompanies the anonymous workshop paper.
+It contains the sealed 61-row table, the frozen protocol file, and
+the pre-registration (including the logistics-exclude sentence).
+It does not recompute AUC.
+
+\section{Sealed per-task table}
+$n{=}61$ (53 go / 8 no-go).
+\texttt{go} iff $\Delta_{\mathrm{full}}>0$.
+% AR.md L24
+BIRD and APPS are not rows:
+\texttt{excluded for logistics, before any label existed}.
+% AR.md L27--30
+Deltas are the sealed JSON companion of
+\texttt{ANALYSIS\_RESULTS.md}. Base pass@1 values are the
+display-rounded figures from the sealed run reports (see comments
+in \texttt{supplementary/table61.tex}).
+
+\input{supplementary/table61}
+
+\section{Frozen protocol}
+Byte copy of the production protocol. Never edited after freeze.
+The listing is the yaml file in this archive
+(\texttt{supplementary/protocol\_v2.yaml}).
+
+\section{Pre-registration}
+Copies of the analysis contract and its supplement S1--S5 live in
+this archive as
+\texttt{supplementary/ANALYSIS\_PREREG.md} and
+\texttt{supplementary/ANALYSIS\_PREREG\_SUPPLEMENT.md}.
+The honesty clause is unchanged: AUC non-significant $=$ publish
+negative. Campaign-close sample is $n{=}61$.
+% AR.md L24
+
+\end{document}

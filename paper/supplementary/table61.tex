@@ -1,0 +1,81 @@
+% 61-row sealed table. Deltas from ANALYSIS_RESULTS.json
+% companion of ANALYSIS_RESULTS.md. base.pass1 from
+% GATE_REPORT L11-13, REPORT_20260824T0024Z L56-113 and L120-122,
+% REPORT_20260825T0851Z L16-18 (tydiqa), REPORT_20260825T0951Z L16-18 (task419).
+% go iff delta_full > 0. No new AUC.
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{@{}p{0.34\linewidth}rrrcp{0.22\linewidth}@{}}
+\caption{Sealed $n{=}61$ table ($\mathrm{go}\Leftrightarrow\Delta_{\mathrm{full}}>0$).}\\
+\label{tab:all61}\\
+\toprule
+\scriptsize Task & \scriptsize base & \scriptsize $\Delta_{\mathrm{p}}$ & \scriptsize $\Delta_{\mathrm{f}}$ & \scriptsize lab. & \scriptsize note \\
+\midrule
+\endfirsthead
+\toprule
+\scriptsize Task & \scriptsize base & \scriptsize $\Delta_{\mathrm{p}}$ & \scriptsize $\Delta_{\mathrm{f}}$ & \scriptsize lab. & \scriptsize note \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+\scriptsize arc\_\hspace{0pt}challenge & \scriptsize 0.780 & \scriptsize $-0.090$ & \scriptsize $+0.020$ & \scriptsize go & \scriptsize  \\
+\scriptsize arc\_\hspace{0pt}easy & \scriptsize 0.850 & \scriptsize $-0.120$ & \scriptsize $+0.035$ & \scriptsize go & \scriptsize PARTIAL; in-sample (AR.md L26) \\
+\scriptsize drop & \scriptsize 0.055 & \scriptsize $+0.275$ & \scriptsize $+0.535$ & \scriptsize go & \scriptsize  \\
+\scriptsize gsm8k & \scriptsize 0.690 & \scriptsize $-0.335$ & \scriptsize $-0.230$ & \scriptsize no-go & \scriptsize format overwrite (AR.md L58) \\
+\scriptsize hellaswag & \scriptsize 0.650 & \scriptsize $-0.140$ & \scriptsize $+0.180$ & \scriptsize go & \scriptsize  \\
+\scriptsize math & \scriptsize 0.355 & \scriptsize $-0.155$ & \scriptsize $-0.160$ & \scriptsize no-go & \scriptsize format overwrite pair (AR.md L58) \\
+\scriptsize mbpp & \scriptsize 0.055 & \scriptsize $-0.030$ & \scriptsize $+0.000$ & \scriptsize no-go & \scriptsize  \\
+\scriptsize piqa & \scriptsize 0.765 & \scriptsize $-0.015$ & \scriptsize $+0.065$ & \scriptsize go & \scriptsize  \\
+\scriptsize spider & \scriptsize 0.495 & \scriptsize $-0.155$ & \scriptsize $+0.150$ & \scriptsize go & \scriptsize  \\
+\scriptsize task010\_\hspace{0pt}mctaco\_\hspace{0pt}answer\_\hspace{0pt}generation\_\hspace{0pt}event\_\hspace{0pt}ordering & \scriptsize 0.055 & \scriptsize $-0.020$ & \scriptsize $+0.040$ & \scriptsize go & \scriptsize  \\
+\scriptsize task014\_\hspace{0pt}mctaco\_\hspace{0pt}wrong\_\hspace{0pt}answer\_\hspace{0pt}generation\_\hspace{0pt}absolute\_\hspace{0pt}timepoint & \scriptsize 0.010 & \scriptsize $-0.010$ & \scriptsize $-0.010$ & \scriptsize no-go & \scriptsize  \\
+\scriptsize task016\_\hspace{0pt}mctaco\_\hspace{0pt}answer\_\hspace{0pt}generation\_\hspace{0pt}frequency & \scriptsize 0.155 & \scriptsize $+0.065$ & \scriptsize $+0.125$ & \scriptsize go & \scriptsize  \\
+\scriptsize task026\_\hspace{0pt}drop\_\hspace{0pt}question\_\hspace{0pt}generation & \scriptsize 0.000 & \scriptsize $+0.000$ & \scriptsize $+0.060$ & \scriptsize go & \scriptsize  \\
+\scriptsize task037\_\hspace{0pt}qasc\_\hspace{0pt}generate\_\hspace{0pt}related\_\hspace{0pt}fact & \scriptsize 0.000 & \scriptsize $+0.000$ & \scriptsize $+0.040$ & \scriptsize go & \scriptsize  \\
+\scriptsize task071\_\hspace{0pt}abductivenli\_\hspace{0pt}answer\_\hspace{0pt}generation & \scriptsize 0.000 & \scriptsize $+0.000$ & \scriptsize $+0.000$ & \scriptsize no-go & \scriptsize EM floor; sens. b (AR.md L52) \\
+\scriptsize task076\_\hspace{0pt}splash\_\hspace{0pt}correcting\_\hspace{0pt}sql\_\hspace{0pt}mistake & \scriptsize 0.000 & \scriptsize $+0.030$ & \scriptsize $+0.160$ & \scriptsize go & \scriptsize  \\
+\scriptsize task094\_\hspace{0pt}conala\_\hspace{0pt}calculate\_\hspace{0pt}mean & \scriptsize 0.000 & \scriptsize $+0.000$ & \scriptsize $+0.045$ & \scriptsize go & \scriptsize  \\
+\scriptsize task113\_\hspace{0pt}count\_\hspace{0pt}frequency\_\hspace{0pt}of\_\hspace{0pt}letter & \scriptsize 0.000 & \scriptsize $+0.260$ & \scriptsize $+0.480$ & \scriptsize go & \scriptsize  \\
+\scriptsize task1202\_\hspace{0pt}atomic\_\hspace{0pt}classification\_\hspace{0pt}xneed & \scriptsize 0.590 & \scriptsize $+0.030$ & \scriptsize $+0.375$ & \scriptsize go & \scriptsize  \\
+\scriptsize task1283\_\hspace{0pt}hrngo\_\hspace{0pt}quality\_\hspace{0pt}classification & \scriptsize 0.555 & \scriptsize $-0.055$ & \scriptsize $+0.405$ & \scriptsize go & \scriptsize  \\
+\scriptsize task1287\_\hspace{0pt}glue\_\hspace{0pt}qqp\_\hspace{0pt}paraphrasing & \scriptsize 0.705 & \scriptsize $+0.100$ & \scriptsize $+0.140$ & \scriptsize go & \scriptsize  \\
+\scriptsize task1295\_\hspace{0pt}adversarial\_\hspace{0pt}qa\_\hspace{0pt}question\_\hspace{0pt}answering & \scriptsize 0.000 & \scriptsize $+0.240$ & \scriptsize $+0.380$ & \scriptsize go & \scriptsize  \\
+\scriptsize task1313\_\hspace{0pt}amazonreview\_\hspace{0pt}polarity\_\hspace{0pt}classification & \scriptsize 0.890 & \scriptsize $+0.080$ & \scriptsize $+0.110$ & \scriptsize go & \scriptsize  \\
+\scriptsize task1386\_\hspace{0pt}anli\_\hspace{0pt}r2\_\hspace{0pt}entailment & \scriptsize 0.235 & \scriptsize $+0.150$ & \scriptsize $+0.240$ & \scriptsize go & \scriptsize  \\
+\scriptsize task1392\_\hspace{0pt}superglue\_\hspace{0pt}multirc\_\hspace{0pt}answer\_\hspace{0pt}verification & \scriptsize 0.750 & \scriptsize $+0.005$ & \scriptsize $+0.095$ & \scriptsize go & \scriptsize  \\
+\scriptsize task1411\_\hspace{0pt}dart\_\hspace{0pt}subject\_\hspace{0pt}identification & \scriptsize 0.285 & \scriptsize $+0.295$ & \scriptsize $+0.560$ & \scriptsize go & \scriptsize  \\
+\scriptsize task1419\_\hspace{0pt}mathqa\_\hspace{0pt}gain & \scriptsize 0.000 & \scriptsize $+0.340$ & \scriptsize $+0.555$ & \scriptsize go & \scriptsize  \\
+\scriptsize task1420\_\hspace{0pt}mathqa\_\hspace{0pt}general & \scriptsize 0.000 & \scriptsize $+0.260$ & \scriptsize $+0.395$ & \scriptsize go & \scriptsize  \\
+\scriptsize task1541\_\hspace{0pt}agnews\_\hspace{0pt}classification & \scriptsize 0.085 & \scriptsize $+0.405$ & \scriptsize $+0.835$ & \scriptsize go & \scriptsize  \\
+\scriptsize task1553\_\hspace{0pt}cnn\_\hspace{0pt}dailymail\_\hspace{0pt}summarization & \scriptsize 0.000 & \scriptsize $+0.000$ & \scriptsize $+0.000$ & \scriptsize no-go & \scriptsize EM floor; sens. b (AR.md L52) \\
+\scriptsize task1600\_\hspace{0pt}smcalflow\_\hspace{0pt}sentence\_\hspace{0pt}generation & \scriptsize 0.000 & \scriptsize $+0.015$ & \scriptsize $+0.015$ & \scriptsize go & \scriptsize  \\
+\scriptsize task1622\_\hspace{0pt}disfl\_\hspace{0pt}qa\_\hspace{0pt}text\_\hspace{0pt}modication & \scriptsize 0.140 & \scriptsize $+0.185$ & \scriptsize $+0.575$ & \scriptsize go & \scriptsize  \\
+\scriptsize task163\_\hspace{0pt}count\_\hspace{0pt}words\_\hspace{0pt}ending\_\hspace{0pt}with\_\hspace{0pt}letter & \scriptsize 0.320 & \scriptsize $+0.000$ & \scriptsize $+0.375$ & \scriptsize go & \scriptsize  \\
+\scriptsize task1661\_\hspace{0pt}super\_\hspace{0pt}glue\_\hspace{0pt}classification & \scriptsize 0.000 & \scriptsize $+0.690$ & \scriptsize $+0.850$ & \scriptsize go & \scriptsize  \\
+\scriptsize task1712\_\hspace{0pt}poki\_\hspace{0pt}classification & \scriptsize 0.730 & \scriptsize $-0.135$ & \scriptsize $+0.010$ & \scriptsize go & \scriptsize  \\
+\scriptsize task196\_\hspace{0pt}sentiment140\_\hspace{0pt}answer\_\hspace{0pt}generation & \scriptsize 0.760 & \scriptsize $+0.015$ & \scriptsize $+0.225$ & \scriptsize go & \scriptsize  \\
+\scriptsize task227\_\hspace{0pt}clariq\_\hspace{0pt}classification & \scriptsize 0.325 & \scriptsize $+0.550$ & \scriptsize $+0.660$ & \scriptsize go & \scriptsize  \\
+\scriptsize task236\_\hspace{0pt}iirc\_\hspace{0pt}question\_\hspace{0pt}from\_\hspace{0pt}passage\_\hspace{0pt}answer\_\hspace{0pt}generation & \scriptsize 0.000 & \scriptsize $+0.000$ & \scriptsize $+0.000$ & \scriptsize no-go & \scriptsize EM floor; sens. b (AR.md L52) \\
+\scriptsize task242\_\hspace{0pt}tweetqa\_\hspace{0pt}classification & \scriptsize 0.845 & \scriptsize $+0.095$ & \scriptsize $+0.130$ & \scriptsize go & \scriptsize  \\
+\scriptsize task278\_\hspace{0pt}stereoset\_\hspace{0pt}sentence\_\hspace{0pt}generation\_\hspace{0pt}antistereotype & \scriptsize 0.000 & \scriptsize $+0.020$ & \scriptsize $+0.115$ & \scriptsize go & \scriptsize  \\
+\scriptsize task286\_\hspace{0pt}olid\_\hspace{0pt}offense\_\hspace{0pt}judgment & \scriptsize 0.675 & \scriptsize $+0.010$ & \scriptsize $+0.090$ & \scriptsize go & \scriptsize  \\
+\scriptsize task305\_\hspace{0pt}jeopardy\_\hspace{0pt}answer\_\hspace{0pt}generation\_\hspace{0pt}normal & \scriptsize 0.160 & \scriptsize $-0.030$ & \scriptsize $+0.135$ & \scriptsize go & \scriptsize  \\
+\scriptsize task339\_\hspace{0pt}record\_\hspace{0pt}answer\_\hspace{0pt}generation & \scriptsize 0.210 & \scriptsize $+0.135$ & \scriptsize $+0.520$ & \scriptsize go & \scriptsize  \\
+\scriptsize task345\_\hspace{0pt}hybridqa\_\hspace{0pt}answer\_\hspace{0pt}generation & \scriptsize 0.000 & \scriptsize $+0.000$ & \scriptsize $+0.585$ & \scriptsize go & \scriptsize  \\
+\scriptsize task366\_\hspace{0pt}synthetic\_\hspace{0pt}return\_\hspace{0pt}primes & \scriptsize 0.000 & \scriptsize $+0.310$ & \scriptsize $+1.000$ & \scriptsize go & \scriptsize  \\
+\scriptsize task383\_\hspace{0pt}matres\_\hspace{0pt}classification & \scriptsize 0.565 & \scriptsize $+0.015$ & \scriptsize $+0.360$ & \scriptsize go & \scriptsize  \\
+\scriptsize task401\_\hspace{0pt}numeric\_\hspace{0pt}fused\_\hspace{0pt}head\_\hspace{0pt}reference & \scriptsize 0.095 & \scriptsize $+0.285$ & \scriptsize $+0.785$ & \scriptsize go & \scriptsize  \\
+\scriptsize task404\_\hspace{0pt}grailqa\_\hspace{0pt}paraphrase\_\hspace{0pt}validation & \scriptsize 0.590 & \scriptsize $+0.125$ & \scriptsize $+0.220$ & \scriptsize go & \scriptsize  \\
+\scriptsize task419\_\hspace{0pt}persent\_\hspace{0pt}answer\_\hspace{0pt}generation & \scriptsize 0.285 & \scriptsize $+0.420$ & \scriptsize $+0.505$ & \scriptsize go & \scriptsize oom fallback (AR.md L61) \\
+\scriptsize task430\_\hspace{0pt}senteval\_\hspace{0pt}subject\_\hspace{0pt}count & \scriptsize 0.400 & \scriptsize $+0.155$ & \scriptsize $+0.570$ & \scriptsize go & \scriptsize  \\
+\scriptsize task455\_\hspace{0pt}swag\_\hspace{0pt}context\_\hspace{0pt}generation & \scriptsize 0.000 & \scriptsize $+0.000$ & \scriptsize $+0.000$ & \scriptsize no-go & \scriptsize EM floor; sens. b (AR.md L52) \\
+\scriptsize task568\_\hspace{0pt}circa\_\hspace{0pt}question\_\hspace{0pt}generation & \scriptsize 0.000 & \scriptsize $+0.000$ & \scriptsize $+0.010$ & \scriptsize go & \scriptsize  \\
+\scriptsize task607\_\hspace{0pt}sbic\_\hspace{0pt}intentional\_\hspace{0pt}offense\_\hspace{0pt}binary\_\hspace{0pt}classification & \scriptsize 0.485 & \scriptsize $+0.000$ & \scriptsize $+0.240$ & \scriptsize go & \scriptsize  \\
+\scriptsize task619\_\hspace{0pt}ohsumed\_\hspace{0pt}abstract\_\hspace{0pt}title\_\hspace{0pt}generation & \scriptsize 0.000 & \scriptsize $+0.015$ & \scriptsize $+0.010$ & \scriptsize go & \scriptsize  \\
+\scriptsize task634\_\hspace{0pt}allegro\_\hspace{0pt}reviews\_\hspace{0pt}classification & \scriptsize 0.000 & \scriptsize $+0.480$ & \scriptsize $+0.760$ & \scriptsize go & \scriptsize  \\
+\scriptsize task647\_\hspace{0pt}answer\_\hspace{0pt}generation & \scriptsize 0.000 & \scriptsize $+0.610$ & \scriptsize $+0.500$ & \scriptsize go & \scriptsize  \\
+\scriptsize task649\_\hspace{0pt}race\_\hspace{0pt}blank\_\hspace{0pt}question\_\hspace{0pt}generation & \scriptsize 0.000 & \scriptsize $+0.000$ & \scriptsize $+0.030$ & \scriptsize go & \scriptsize  \\
+\scriptsize task677\_\hspace{0pt}ollie\_\hspace{0pt}sentence\_\hspace{0pt}answer\_\hspace{0pt}generation & \scriptsize 0.000 & \scriptsize $+0.000$ & \scriptsize $+0.010$ & \scriptsize go & \scriptsize  \\
+\scriptsize task896\_\hspace{0pt}miam\_\hspace{0pt}language\_\hspace{0pt}classification & \scriptsize 0.025 & \scriptsize $+0.970$ & \scriptsize $+0.970$ & \scriptsize go & \scriptsize  \\
+\scriptsize tydiqa & \scriptsize 0.170 & \scriptsize $+0.260$ & \scriptsize $+0.530$ & \scriptsize go & \scriptsize oom fallback (AR.md L61) \\
+\scriptsize winogrande & \scriptsize 0.560 & \scriptsize $-0.055$ & \scriptsize $+0.190$ & \scriptsize go & \scriptsize  \\
+\end{longtable}
