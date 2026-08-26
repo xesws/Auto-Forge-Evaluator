@@ -2,6 +2,10 @@
 
 \usepackage[dblblindworkshop]{neurips_2026}
 
+% Ledger: official zip sets
+%   \workshoptitle{Workshop for Autonomous ML Research }
+% (short name, trailing space). We keep the expanded name already
+% frozen in [paper-1]. Both are acceptable; see docs/ledger.md.
 \workshoptitle{Workshop for Autonomous Machine Learning Research}
 
 \usepackage[utf8]{inputenc}
@@ -10,10 +14,18 @@
 \usepackage{url}
 \usepackage{booktabs}
 \usepackage{amsfonts}
+\usepackage{amsmath}
 \usepackage{nicefrac}
 \usepackage{microtype}
 \usepackage{xcolor}
 \usepackage{graphicx}
+\usepackage{caption}
+\usepackage{placeins}
+\usepackage{float}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,fit}
+
+\graphicspath{{figures/}}
 
 \title{To Forge or Not to Forge: Predicting Task-Level Fine-Tuning Gains from Ten-Example Pilots}
 
@@ -34,23 +46,30 @@ or by paying for the full training run. We ask whether ten
 labeled examples can answer it in advance. Under a single frozen
 protocol (Qwen2.5-1.5B-Instruct, fixed LoRA recipe and budgets,
 greedy decoding, execution-based verifiers), we measure 61 tasks
+% AR.md L24 n=61
 --- 11 anchored in the small-model post-training literature and 50
 drawn by a pre-registered filter from Super-NaturalInstructions ---
 pairing a ten-example pilot with a full fine-tune whose measured
 gain serves as ground truth. All analyses were pre-registered.
 We find: (1) fine-tuning helps far more often than not --- 53 of
 61 tasks (87\%) show positive full-training gains, making ``forge''
+% AR.md L18 87% / 86.9%; L24 53 go / 61; abstract freeze keeps 87\%
 the empirical default in this regime; (2) pilot signals
 significantly rank gain magnitude (Spearman 0.755, 95\% CI
-[0.60, 0.86]), enabling budget allocation by ranking; (3) the
+[0.60, 0.86]), enabling budget allocation by ranking;
+% AR.md L16,L48 Spearman 0.755 [0.595, 0.864]; abstract freeze rounds CI to [0.60, 0.86]
+(3) the
 pre-registered binary go/no-go endpoint is not established
 (leave-one-task-out AUC 0.755, bootstrap CI [0.50, 0.93]), a
+% AR.md L15,L36 AUC 0.755 [0.500, 0.929]; abstract freeze rounds CI to [0.50, 0.93]
 power limit rooted in the empirical scarcity of no-go tasks
 itself; and (4) description-only features predict below chance
 (AUC 0.31) --- the decision-relevant information exists only in
+% AR.md L17,L44 text-only 0.309 [0.045, 0.622]; abstract freeze rounds to 0.31
 actually running the pilot. We characterize the no-go tail,
 including negative transfer on heavily post-trained bases
 (GSM8K $-0.23$ despite in-domain training), and release the
+% AR.md L58 gsm8k Δ_full −0.230; abstract freeze rounds to −0.23
 benchmark, protocol, and all sealed artifacts.
 These sealed measurements and pre-registered analyses were produced by an autonomous discover-pilot-decide-train-validate system; without that system's contribution the 61-task ground-truth table would not exist.
 \end{abstract}
@@ -58,14 +77,27 @@ These sealed measurements and pre-registered analyses were produced by an autono
 \noindent\textbf{Keywords:} fine-tuning, evaluation, small language models
 
 \input{part1}
+\clearpage
 \input{part2}
+\clearpage
 \input{part3}
 
 \clearpage
 \appendix
 
 \section{Reproducibility Statement}
-\textit{Stub.}
+The protocol file, pre-registration, and the sealed 61-row
+% AR.md L24
+per-task table are packed in the supplementary archive.
+Protocol hyperparameters were never edited after freeze.
+Dataset papers for the literature-layer table:
+\nocite{gsm8k,winogrande,spider,math,mbpp,drop,tydiqa,arc,hellaswag,piqa}
+Disclosed run-level exceptions (OOM fallback on two tasks;
+% AR.md L61
+one PARTIAL in-sample row) are listed in Setup and in the
+% AR.md L26 arc_easy
+supplementary protocol notes. Figures in Part~1 are redrawn
+from the frozen plot payload; they are not a new analysis.
 
 \section{Disclosure Statement}
 
@@ -79,6 +111,7 @@ These sealed measurements and pre-registered analyses were produced by an autono
     a human-authored, human-verified artifact.
 \end{itemize}
 
-\section{References}
+\bibliographystyle{plainnat}
+\bibliography{refs}
 
 \end{document}

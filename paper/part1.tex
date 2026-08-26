@@ -1,2 +1,80 @@
 \section{Autonomous research result}
-\textit{Part 1 stub (CFP $\leq$4 pages). Setup, results, and compact framing to follow.}
+\label{sec:part1}
+
+\subsection{Setup}
+\label{sec:setup}
+The operational question is whether a ten-example LoRA probe can
+tell, in advance, whether full fine-tuning of a small specialist
+will raise greedy pass@1. We test that question under one frozen
+protocol, with the analysis contract written down before the
+remaining production runs, and with an honesty clause that a
+non-significant AUC is published as a negative result.
+
+\paragraph{Protocol.}
+The base is Qwen2.5-1.5B-Instruct~\citep{qwen25}, weights pinned at
+birth (\texttt{989aa798}$\ldots$; full sha in the protocol file).
+% protocol_v2.yaml L1--2 (not AR.md; yaml is the frozen recipe)
+LoRA rank 16, $\alpha=32$, dropout 0.05, on attention and MLP
+projections; sequence length 4096; per-device batch 2 $\times$
+accumulation 8 (effective batch 16); learning rate
+$1.0\times 10^{-4}$ cosine, warmup 0.03; completion-only loss on
+the chat template.
+% protocol_v2.yaml L3--25
+Pilot: 10 examples, 100 steps, seed 20260820. Full: cap 8000,
+3 epochs, same seed. Eval: 200-example slice, seed 20260820,
+greedy decoding.
+% protocol_v2.yaml L26--38
+pass@8 ($k{=}8$, temperature 1.0, top-$p$ 0.95) is a signal, never
+the label.
+% protocol_v2.yaml L39--44
+Labels are greedy pass@1; $\Delta$ is the difference from the
+unadapted base. $\mathrm{go}\Leftrightarrow\Delta_{\mathrm{full}}>0$
+(strict; zeros are no-go).
+% AR.md L24; ANALYSIS_PREREG.md L8--9
+
+\paragraph{Sample.}
+The sealed analysis set is $n{=}61$ tasks:
+% AR.md L22--24
+11 anchored in the small-model post-training literature
+(Table~\ref{tab:lit})
+and 50 drawn from Super-NaturalInstructions~\citep{wang2022superni}
+by a pre-registered English-and-size filter, stratified on
+\texttt{Categories[0]}, seed 20260822, with \texttt{Source[0]}
+capped at 3.
+% ANALYSIS_PREREG_SUPPLEMENT.md L67--80, L104--108 (sample recipe, not AR.md)
+The intended literature layer was 13; BIRD and introductory APPS
+produced no go-label and are
+\texttt{excluded for logistics, before any label existed}.
+% AR.md L27--30
+The sample contains 53 go and 8 no-go tasks
+($53/61\approx 86.9\%$).
+% AR.md L18, L24
+Two long-context tasks (TyDiQA, SuperNI task419) entered after a
+disclosed OOM fallback that keeps effective batch 16
+($\Delta_{\mathrm{full}}+0.530$ / $+0.505$).
+% AR.md L61
+ARC-Easy is in-sample as PARTIAL with metrics present.
+% AR.md L26
+
+\paragraph{Predictors and intervals.}
+The primary model is a task-level leave-one-task-out logistic
+regression on the frozen numeric signal vector, including a
+pre-declared format-compliance scalar. Interval estimates are
+task-level bootstrap 95\% CIs on the LOTO pairs
+$(y_i,p_i)$. The secondary endpoint is Spearman
+$\rho(\Delta_{\mathrm{pilot}},\Delta_{\mathrm{full}})$. A
+text-only logistic that never sees a probe --- train size,
+\texttt{max\_new\_tokens}, prompt-style length, eval $n$ --- is
+the no-pilot control. Single-feature logistics are reported
+alongside. Cluster-level AUCs were pre-declared and are not
+estimable.
+% AR.md L32--45, L54; ANALYSIS_PREREG.md L13--38
+
+\subsection{Results}
+\label{sec:results}
+\textit{Results to follow.}
+\label{tab:lit}\label{tab:auc}\label{fig:baserate}\label{fig:scatter}
+
+\subsection{Discussion}
+\label{sec:discussion}
+\textit{Discussion to follow.}
