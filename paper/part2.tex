@@ -1,2 +1,76 @@
 \section{System Design and Meta-Analysis}
-\textit{Part 2 stub (CFP $\leq$4 pages; human-authored). Harness, interventions, and verification to follow.}
+\label{sec:part2}
+% CFP: human-authored companion. Narrative is operator-owned.
+% This file holds CFP subsection slots plus a material pack.
+% No Part~2 prose is written here.
+
+\subsection{Agent and Harness}
+\begin{center}\texttt{[OPERATOR PROSE HERE]}\end{center}
+
+\subsection{Tools}
+\begin{center}\texttt{[OPERATOR PROSE HERE]}\end{center}
+
+\subsection{Research Loop}
+\begin{center}\texttt{[OPERATOR PROSE HERE]}\end{center}
+
+\subsection{Human Interventions}
+\begin{center}\texttt{[OPERATOR PROSE HERE]}\end{center}
+
+\subsection{Verification}
+\begin{center}\texttt{[OPERATOR PROSE HERE]}\end{center}
+
+\subsection{Significance of result}
+\begin{center}\texttt{[OPERATOR PROSE HERE]}\end{center}
+
+\subsection{Interpretability}
+\begin{center}\texttt{[OPERATOR PROSE HERE]}\end{center}
+
+\subsection{Limitations}
+\begin{center}\texttt{[OPERATOR PROSE HERE]}\end{center}
+
+\subsubsection*{Material pack}
+\label{sec:part2-materials}
+% Lists and one figure only. Not narrative. Operator draws prose
+% from paper/materials/*.md. Numbers that appear below are
+% already sealed; no new AUC.
+
+\paragraph{Intervention-point checklist.}
+\begin{enumerate}
+  \item Protocol freeze at v2 (no v3). Pilot $10{\times}100$ kept as the probe.
+  \item Sample-frame correction: pool rows $\neq$ tasks; intended $13$ literature $+50$ SuperNI $=63$.
+  \item Dual-worker plan cancelled; one serial queue of 60.
+  \item BIRD packed as a separate later package; Mini-Dev never used.
+  \item False-negative remote-shell diagnosis (tool layer, not host); production started after the correction.
+  \item APPS wall: 3h then 8h ops fence, declared before any APPS label.
+  \item BIRD checker aligned to dual zip-sha fields (not a single \texttt{sha256} key).
+  \item Failed run directories isolated, not deleted.
+  \item OOM fallback $1{\times}16$ only for TyDiQA and SuperNI task419; effective batch unchanged.
+  \item Campaign close: $n{=}61$; BIRD/APPS logistics exclude before any label.
+    % AR.md L24, L27--30
+\end{enumerate}
+
+\paragraph{System-number archive.}
+\begin{itemize}
+  \item Sealed sample $n{=}61$ ($53$ go / $8$ no-go).
+    % AR.md L24
+  \item Serial queue $60/60$ completed; two literature-layer tasks produced no label.
+  \item Protocol yaml never edited after freeze.
+  \item Disclosed in-sample exceptions: ARC-Easy PARTIAL; TyDiQA/task419 OOM fallback
+    ($\Delta_{\mathrm{full}}+0.530$ / $+0.505$).
+    % AR.md L26, L61
+  \item APPS S1 base pass@1 $0.0$ / pass@8 $0.005$: limitations footnote, not a row.
+    % AR.md L30
+  \item Total GPU-hours: not computed; do not invent.
+\end{itemize}
+
+\paragraph{Architecture (material figure).}
+Figure~\ref{fig:arch} is a schematic of the factory--queue--gates--harvest loop used to produce the sealed table. Caption is factual, not Part~2 narrative.
+
+\begin{figure}[h]
+  \centering
+  \input{figures/architecture}
+  \caption{Factory $\rightarrow$ serial queue $\rightarrow$ per-task
+    S0--S6 runner $\rightarrow$ gates $\rightarrow$ harvest $\rightarrow$
+    sealed analysis. Dashed boxes: human intervention points.}
+  \label{fig:arch}
+\end{figure}

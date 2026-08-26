@@ -1,0 +1,22 @@
+\begin{tikzpicture}[
+  font=\scriptsize,
+  box/.style={draw, rounded corners=2pt, align=center, inner sep=4pt, minimum height=8.5mm},
+  dashbox/.style={draw, dashed, rounded corners=2pt, align=center, inner sep=3pt},
+  arr/.style={-{Latex}, thick}
+]
+\node[box] (factory) {Task factory\\[-1pt]{\tiny literature pack + SuperNI sample}};
+\node[box, right=6mm of factory] (pkgs) {Packages\\[-1pt]{\tiny leftover / 59-pack / bird-only}};
+\node[box, right=6mm of pkgs] (queue) {Serial queue\\[-1pt]{\tiny 60 slots}};
+\node[box, below=8mm of queue] (runner) {S0--S6 runner\\[-1pt]{\tiny base / 10-shot / full / eval}};
+\node[box, left=6mm of runner] (gates) {Gates\\[-1pt]{\tiny parse / loss / systems / det.}};
+\node[box, left=6mm of gates] (harvest) {Harvest\\[-1pt]{\tiny incremental then full tar}};
+\node[box, below=8mm of harvest] (analysis) {Sealed analysis\\[-1pt]{\tiny pre-reg + honesty clause}};
+\node[dashbox, above=7mm of queue] (human) {Human interventions\\[-1pt]{\tiny freeze / fence / fallback / close}};
+\draw[arr] (factory) -- (pkgs);
+\draw[arr] (pkgs) -- (queue);
+\draw[arr] (queue) -- (runner);
+\draw[arr] (runner) -- (gates);
+\draw[arr] (gates) -- (harvest);
+\draw[arr] (harvest) -- (analysis);
+\draw[arr, dashed] (human) -- (queue);
+\end{tikzpicture}
