@@ -1,24 +1,54 @@
 \section{Broader Impact}
 \label{sec:part3}
-% CFP: $\leq$ 1 page. Narrative is operator-owned.
-% No Part~3 prose is written here.
+% Four ledger-grounded reflections. No generic manifesto.
 
-\begin{center}\texttt{[OPERATOR PROSE HERE]}\end{center}
+Guardrails earned their keep when they failed \emph{closed}.
+The BIRD checker aborted on a missing \texttt{sha256} key rather
+than packing a substitute hash or writing a fake
+\texttt{metrics.json}; the later CUDA OOM likewise produced no
+label.
+% ledger 2026-08-24 KeyError; 2026-08-25 S2 OOM; AR.md L27--29
+GSM8K's negative $\Delta_{\mathrm{full}}$ came with unparseable
+$0/200$ and a format-compliance shift from mixed
+\texttt{\#\#\#\#}/last-number at base to \texttt{\#\#\#\#} 200/200
+after training --- evidence against an EOS/truncation story, and
+the reason the operator could rule ``format overwrite'' instead of
+discarding a negative as a generation glitch.
+% GATE_REPORT L21, L28, L32; AR.md L58
+A rail that invents a number to keep a queue green is not a rail.
 
-\subsubsection*{Reflection-candidate list}
-\label{sec:part3-materials}
-% Candidates only. Operator writes the 1-page reflection.
-\begin{enumerate}
-  \item Tool-layer false-negative connectivity vs.\ actual host failure: a process risk for autonomous long jobs.
-  \item Schema lag (checker vs.\ dual zip-sha fields) vs.\ logistics: labels must not be invented to close a queue.
-  \item Format overwrite vs.\ EOS as the GSM8K mechanism
-    ($\Delta_{\mathrm{full}}=-0.230$).
-    % AR.md L58
-  \item Wall-clock as ops fence vs.\ measurement semantics (APPS 3h then 8h, still no $\Delta_{\mathrm{full}}$).
-    % AR.md L30
-  \item Negative-class scarcity ($8$ no-go / $61$) as a first-class design constraint for any go/no-go endpoint.
-    % AR.md L24
-  \item Description-only features running below chance (AUC $0.309$): skipping the GPU is not a cheap substitute.
-    % AR.md L17, L44
-  \item How the field should adapt: pre-register the honesty clause before the remaining runs; freeze the protocol; do not reopen logistics excludes after seeing labels.
-\end{enumerate}
+Pre-registration is what made the negative primary endpoint
+publishable. The honesty clause (bootstrap CI covering $0.5$
+equals a negative, to be printed) was committed before the
+remaining sixty GPU slots and before any AUC existed.
+% ANALYSIS_PREREG.md L36--41; ledger 2026-08-22
+After the seal, the tempting moves --- add a feature, drop GSM8K,
+move the go threshold, reopen BIRD --- were exactly the moves the
+contract forbids. With 8 no-go tasks the gate was always going to
+be under-powered; the clause prevented that fact from being
+negotiated away in the write-up.
+% AR.md L24, L15--16
+
+STOP points were the human--agent interface, with a mixed record.
+The protocol-v3 STOP (keep $10{\times}100$; recitation is the probe)
+and the analysis STOP (no production before the SuperNI ids and
+the pre-reg were on the mainline) are the reason Part~1 has one
+recipe and one contract.
+% ledger 2026-08-22 freeze; ANALYSIS_PREREG_SUPPLEMENT.md S2
+The cost is real: Gate~1 started before Gate~0 was accepted, and
+the connectivity misreport looked like downtime until a human
+asked for a one-line multiplex check.
+% ledger 2026-08-21 procedure slip; 2026-08-22 SSH misreport
+A STOP that exists only as a chatbot apology does not stop a GPU.
+
+Diagnosis was split on purpose. The agent is responsible for
+five-eye tables, SHA checks, journal resume, and for writing
+\texttt{PARTIAL} rather than a guessed $\Delta$. The operator is
+responsible for mechanism rulings (format overwrite), for
+ops-fence vs measurement (APPS 3\,h then 8\,h), and for the
+exclude sentence that may be used only
+\emph{before any label existed}.
+% ledger Gate 0 ruling; S4 8h; AR.md L27--30
+We would like the field to copy that split: freeze the recipe,
+pre-register the honesty clause, fail closed, and keep the
+operator on the one-way door out of the sample.
