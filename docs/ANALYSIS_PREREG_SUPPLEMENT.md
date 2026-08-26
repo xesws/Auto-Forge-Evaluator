@@ -203,3 +203,16 @@ task896_miam_language_classification
 主样本(补跑全 ok 时): 55 tv4 STATUS=ok + 3 tv3 + arc_easy(PARTIAL,有 metrics) + 4 补跑 = 63。无 `metrics.json` 的 PARTIAL/over_budget 不进 AUC。
 
 预检: 仅 58 个 STATUS=ok,输出打 `PRELIMINARY — not quotable` 水印,不可引用。
+
+---
+
+## Commit S5 战役关账(分析封册, bird/apps 战线关闭)
+
+写于 `docs/ANALYSIS_RESULTS.md` `--final` 数字已经落盘之后。本块**不是**新分析,禁止再算 AUC。
+
+- 可引用真源唯一: `docs/ANALYSIS_RESULTS.md`。论文叙事 = 四发现: 阴性主门 / 显著排序 / 描述反向 / 87% 基率。敏感性 a/b 并列主表。不再补算。
+- 分析集 **封死 n=61**。
+- **bird** 与 **apps** 战线关闭,不再抢救。二者均无 go 标签(bird 无任何 metrics; apps 无 Δ_full / 无 metrics.json)。排除句原文,对二者各用一次:
+  excluded for logistics, before any label existed
+- apps 的 S1 base 0.0/0.005 只进 limitations,作为负类缺席的注脚,不是分析行。
+- S3 旧排除句 `excluded for logistics, before any bird number existed` 被本块取代: 实际发生的是「无标签」而非 2h 物化失败。
