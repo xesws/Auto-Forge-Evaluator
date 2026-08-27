@@ -39,3 +39,6 @@ paper/*.fls
 paper/*.fdb_latexmk
 paper/*.synctex.gz
 paper/*.toc
+
+# anonymous supplementary zips (operator uploads)
+paper/supplementary/anonymous_supp_*.zip
