@@ -12,8 +12,12 @@ mkdir -p "$STAGE/analysis" "$STAGE/metrics" "$STAGE/eval" "$STAGE/prereg" "$STAG
 
 cp "$ROOT/scripts/analysis.py" "$STAGE/analysis/"
 cp "$ROOT/scripts/analysis_v2.py" "$STAGE/analysis/"
+cp "$ROOT/scripts/analysis_v2_addendum.py" "$STAGE/analysis/"
 cp "$ROOT/scripts/plot_v2_figures.py" "$STAGE/analysis/"
 cp "$ROOT/docs/ANALYSIS_RESULTS_v2.md" "$STAGE/analysis/"
+cp "$ROOT/docs/ANALYSIS_RESULTS_v2_ADDENDUM.md" "$STAGE/analysis/ANALYSIS_RESULTS_v2_ADDENDUM.zh.md"
+cp "$ROOT/docs/ANALYSIS_RESULTS_v2_ADDENDUM.json" "$STAGE/analysis/"
+cp "$ROOT/paper/supplementary/ANALYSIS_RESULTS_v2_ADDENDUM_en.md" "$STAGE/analysis/"
 python3 - "$ROOT/docs/ANALYSIS_RESULTS_v2.json" "$STAGE/analysis/ANALYSIS_RESULTS_v2.json" <<'PY'
 import json, sys
 from pathlib import Path
@@ -25,7 +29,9 @@ PY
 cp "$ROOT/docs/ANALYSIS_RESULTS.md" "$STAGE/analysis/"
 cp "$ROOT/paper/supplementary/ANALYSIS_PREREG_en.md" "$STAGE/prereg/"
 cp "$ROOT/docs/ANALYSIS_PREREG.md" "$STAGE/prereg/ANALYSIS_PREREG.zh.md"
-cp "$ROOT/docs/ANALYSIS_PREREG_V2.md" "$STAGE/prereg/"
+cp "$ROOT/docs/ANALYSIS_PREREG_V2.md" "$STAGE/prereg/ANALYSIS_PREREG_V2.zh.md"
+cp "$ROOT/paper/supplementary/ANALYSIS_PREREG_SUPPLEMENT_en.md" "$STAGE/prereg/"
+cp "$ROOT/docs/ANALYSIS_PREREG_SUPPLEMENT.md" "$STAGE/prereg/ANALYSIS_PREREG_SUPPLEMENT.zh.md"
 cp "$ROOT/configs/protocol_v2.yaml" "$STAGE/protocol/"
 
 python3 - "$ROOT" "$STAGE" <<'PY'
@@ -40,7 +46,26 @@ for i, d in enumerate(blob["run_dirs"]):
     dest.mkdir(parents=True, exist_ok=True)
     for name in ("metrics.json", "STATUS", "journal.jsonl"):
         p = src / name
-        if p.is_file():
+        if not p.is_file():
+            continue
+        if name == "metrics.json":
+            # De-anonymise: signals.pilot_loss.source held absolute host paths
+            # (e.g. /Users/<name>/.../runs/gate0_gsm8k.log) for the three smoke
+            # tasks. Replace every absolute path with its basename. This changes
+            # the file's sha256 relative to the sealed original; see README.
+            metrics_blob = json.loads(p.read_text(encoding="utf-8"))
+
+            def scrub(node):
+                if isinstance(node, dict):
+                    return {k: scrub(v) for k, v in node.items()}
+                if isinstance(node, list):
+                    return [scrub(v) for v in node]
+                if isinstance(node, str) and node.startswith("/") and "/" in node[1:]:
+                    return Path(node).name
+                return node
+
+            (dest / name).write_text(json.dumps(scrub(metrics_blob), indent=2) + "\n", encoding="utf-8")
+        else:
             shutil.copy2(p, dest / name)
     ev = stage / "eval" / tid
     ev.mkdir(parents=True, exist_ok=True)
@@ -54,14 +79,22 @@ PY
 cat > "$STAGE/README.md" <<'EOF'
 # Anonymous supplementary archive
 
-- `analysis/` — registered analysis.py, revision analysis_v2.py, RESULTS_v2
+- `analysis/` — registered analysis.py, revision analysis_v2.py,
+  analysis_v2_addendum.py, RESULTS_v2 and the ADDENDUM that corrects its
+  attribution (read ANALYSIS_RESULTS_v2_ADDENDUM_en.md first)
 - `metrics/` — per-task metrics.json + journal + STATUS
 - `eval/` — paired greedy jsonl used for McNemar
 - `prereg/` — English translation + Chinese originals (Chinese wins)
 - `protocol/` — frozen protocol_v2.yaml
 
-No author names, hosts, or repository URLs.
-Run on CPU: `python analysis/analysis_v2.py` from a checkout that has `runs/`.
+No author names, hosts, or repository URLs. `metrics/*/metrics.json` are the
+sealed originals with one change: absolute filesystem paths (they appeared in
+`signals.pilot_loss.source` for the three smoke tasks) are reduced to basenames,
+so those files' sha256 differ from the sealed values. No numeric field is touched.
+Run on CPU: `python analysis/analysis_v2.py`, then
+`python analysis/analysis_v2_addendum.py`, from a checkout that has `runs/`.
+The addendum reproduces the leakage-vs-bugfix decomposition, the permutation
+tests and the drop-one-negative jackknife reported in the paper.
 EOF
 
 (cd "$STAGE" && zip -qr "$OUT" .)

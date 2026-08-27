@@ -26,6 +26,23 @@ formatting points against the CFP (automlr.com, “Length and structure”).
    ticked only after a human author has line-checked every claim. They
    are unchecked in any draft we circulate before that.
 
+5. Post-registration correction, disclosed. During a CPU-only
+   revision we found that our analysis code had changed one feature
+   *definition* outside the revision's own written contract: the
+   format-compliance scalar `1 - unparseable/n` silently returns 1.0
+   for tasks whose compliance block has no `unparseable` key, and we
+   had special-cased only one of the two such tasks. Fixing the second
+   is correct on the merits, but it moves one cell of the design
+   matrix and is worth +0.182 AUC on the affected model — more than
+   the leakage removal it was reported alongside. We have (a) filed it
+   as a late declaration in the revision contract, (b) published the
+   full before/after decomposition, permutation tests and a
+   drop-one-negative jackknife in an addendum, and (c) rewritten the
+   paper's claim to rest on a model that is invariant to the fix. The
+   pre-registered primary endpoint remains negative and is published
+   as such. We flag this proactively rather than have a reviewer find
+   it; if the chairs would prefer a different treatment, tell us.
+
 Please tell us if (2) should be omitted.
 
 Anonymously,
