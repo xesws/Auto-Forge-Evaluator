@@ -1,0 +1,166 @@
+{
+  "identity": "revision-period addendum to ANALYSIS_RESULTS_v2; no protocol / no go-threshold / no GPU change",
+  "ts": "2026-08-27T01:59:32Z",
+  "git_head": "bb956585c5a2",
+  "n": 61,
+  "fc_definition_change": {
+    "where": "scripts/analysis_v2.py::format_compliance_base",
+    "branch": "task_id == 'math' -> base['boxed'] / n",
+    "declared_in_prereg_v2": false,
+    "tasks_with_different_value": [
+      "math"
+    ],
+    "v1_blind_tasks": [
+      {
+        "task_id": "gsm8k",
+        "scalar_keys": [
+          "diverge",
+          "hash",
+          "last_only",
+          "n",
+          "none"
+        ],
+        "v1_value": 0.29,
+        "v2_value": 0.29
+      },
+      {
+        "task_id": "math",
+        "scalar_keys": [
+          "boxed",
+          "diverge",
+          "last_only",
+          "n",
+          "none"
+        ],
+        "v1_value": 1.0,
+        "v2_value": 0.55
+      }
+    ]
+  },
+  "decomposition": {
+    "pre_decision_10": {
+      "fc_v2": 0.8443396226415094,
+      "fc_v1": 0.6627358490566038,
+      "delta": 0.18160377358490565
+    },
+    "no_pass8": {
+      "fc_v2": 0.8372641509433962,
+      "fc_v1": 0.6745283018867925,
+      "delta": 0.16273584905660377
+    },
+    "trio_3feat": {
+      "fc_v2": 0.7665094339622642,
+      "fc_v1": 0.7665094339622642,
+      "delta": 0.0
+    },
+    "registered_leaked_12": {
+      "fc_v2": 0.7547169811320755,
+      "fc_v1": 0.7547169811320755,
+      "delta": 0.0
+    },
+    "l2cv_pre_decision": {
+      "fc_v2": 0.875,
+      "fc_v1": 0.7216981132075472,
+      "delta": 0.15330188679245282
+    }
+  },
+  "candidate_main_rows": {
+    "pre_decision_fc_v1_deleak_only": {
+      "auc": 0.6627358490566038,
+      "ci95": [
+        0.4332804232804233,
+        0.8393939393939394
+      ],
+      "covers_0.5": true,
+      "permutation": {
+        "n_perm": 1000,
+        "seed": 20260826,
+        "n_ge_observed": 56,
+        "p_unbiased": 0.056943056943056944,
+        "p_naive_v2_convention": 0.056,
+        "perm_mean": 0.41708962264150945
+      }
+    },
+    "pre_decision_fc_v2_deleak_plus_mathfix": {
+      "auc": 0.8443396226415094,
+      "ci95": [
+        0.7333226495726496,
+        0.9428571428571428
+      ],
+      "covers_0.5": false,
+      "permutation": {
+        "n_perm": 1000,
+        "seed": 20260826,
+        "n_ge_observed": 1,
+        "p_unbiased": 0.001998001998001998,
+        "p_naive_v2_convention": 0.001,
+        "perm_mean": 0.41793396226415097
+      }
+    },
+    "trio_3feat_fc_invariant": {
+      "auc": 0.7665094339622642,
+      "ci95": [
+        0.6455026455026456,
+        0.8793275862068965
+      ],
+      "covers_0.5": false,
+      "permutation": {
+        "n_perm": 1000,
+        "seed": 20260826,
+        "n_ge_observed": 3,
+        "p_unbiased": 0.003996003996003996,
+        "p_naive_v2_convention": 0.003,
+        "perm_mean": 0.359688679245283
+      }
+    }
+  },
+  "jackknife_drop_one_negative_on_fc_v2_pre_decision": {
+    "full_sample_auc": 0.8443396226415094,
+    "rows": [
+      {
+        "dropped": "math",
+        "auc": 0.6846361185983827,
+        "delta": -0.15970350404312672
+      },
+      {
+        "dropped": "gsm8k",
+        "auc": 0.7142857142857143,
+        "delta": -0.1300539083557951
+      },
+      {
+        "dropped": "task014_mctaco_wrong_answer_generation_absolute_timepoint",
+        "auc": 0.8328840970350404,
+        "delta": -0.011455525606469008
+      },
+      {
+        "dropped": "task236_iirc_question_from_passage_answer_generation",
+        "auc": 0.84366576819407,
+        "delta": -0.0006738544474393926
+      },
+      {
+        "dropped": "task1553_cnn_dailymail_summarization",
+        "auc": 0.8463611859838275,
+        "delta": 0.0020215633423180668
+      },
+      {
+        "dropped": "mbpp",
+        "auc": 0.8544474393530996,
+        "delta": 0.010107816711590223
+      },
+      {
+        "dropped": "task071_abductivenli_answer_generation",
+        "auc": 0.8652291105121295,
+        "delta": 0.02088948787062006
+      },
+      {
+        "dropped": "task455_swag_context_generation",
+        "auc": 0.8706199460916442,
+        "delta": 0.026280323450134757
+      }
+    ],
+    "range": [
+      0.6846361185983827,
+      0.8706199460916442
+    ]
+  }
+}

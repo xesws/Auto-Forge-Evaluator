@@ -7,7 +7,13 @@
 - n = **61**（53 go under registered label Δ_full>0）
 
 **身份: 修订期新增分析。** v1 `ANALYSIS_RESULTS.md` 仍是注册主行真源。
-本文件是去泄漏后的论文新主数真源。
+
+> ⚠️ **归因部分已被更正。** 本文件把 0.755 → 0.844 归因为「去泄漏」，这是**错的**：
+> 单纯去泄漏是 0.755 → **0.663**（下降）；+0.182 的涨幅全部来自 `analysis_v2.py`
+> 里一个未申报的 `math` format-compliance bug 修复。
+> 分解、修复前/后双值、置换 p 的正确写法、jackknife 见
+> **`docs/ANALYSIS_RESULTS_v2_ADDENDUM.md`**（合同补条见 `ANALYSIS_PREREG_V2.md` R1-9）。
+> 两文冲突处**以 ADDENDUM 为准**。本文件下列数字本身可复现，不改。
 
 ## 主表（pre-decision LOTO）
 
