@@ -1,276 +1,257 @@
 \section{Autonomous research result}
 \label{sec:part1}
 
-\subsection{Setup}
-\label{sec:setup}
-The operational question is whether a ten-example LoRA probe can
-tell, in advance, whether full fine-tuning of a small specialist
-will raise greedy pass@1. We test that question under one frozen
-protocol, with the analysis contract written down before the
-remaining production runs, and with an honesty clause that a
-non-significant AUC is published as a negative result.
+\subsection{Hypothesis}
+\label{sec:hypothesis}
+Under a single frozen LoRA recipe on a 1.5B instruction-tuned base,
+can a ten-example probe decide \emph{which} tasks to fully
+fine-tune, and is that decision a binary gate or a ranking for a
+budget of $K$ slots?
+% this regime: protocol_v2; Qwen2.5-1.5B-Instruct
+We pre-register a binary label
+$\mathrm{go}\Leftrightarrow\Delta_{\mathrm{full}}>0$ and a
+secondary ranking endpoint $\rho(\Delta_{\mathrm{pilot}},
+\Delta_{\mathrm{full}})$, with the honesty clause that a
+non-significant AUC is published as a negative.
+% ANALYSIS_PREREG.md L8--41
+A later, declared revision (v2) asks the same questions after
+removing post-decision features from the classifier, and quantifies
+the \emph{utility} of a perfect gate versus always forging.
+% ANALYSIS_PREREG_V2.md; ANALYSIS_RESULTS_v2.md
 
-\paragraph{Protocol.}
-The base is Qwen2.5-1.5B-Instruct~\citep{qwen25}, weights pinned at
-birth (\texttt{989aa798}$\ldots$; full sha in the protocol file).
-% protocol_v2.yaml L1--2 (not AR.md; yaml is the frozen recipe)
-LoRA rank 16, $\alpha=32$, dropout 0.05, on attention and MLP
-projections; sequence length 4096; per-device batch 2 $\times$
-accumulation 8 (effective batch 16); learning rate
-$1.0\times 10^{-4}$ cosine, warmup 0.03; completion-only loss on
-the chat template.
-% protocol_v2.yaml L3--25
-Pilot: 10 examples, 100 steps, seed 20260820. Full: cap 8000,
-3 epochs, same seed. Eval: 200-example slice, seed 20260820,
-greedy decoding.
-% protocol_v2.yaml L26--38
-pass@8 ($k{=}8$, temperature 1.0, top-$p$ 0.95) is a signal, never
-the label.
-% protocol_v2.yaml L39--44
-Labels are greedy pass@1; $\Delta$ is the difference from the
-unadapted base. $\mathrm{go}\Leftrightarrow\Delta_{\mathrm{full}}>0$
-(strict; zeros are no-go).
-% AR.md L24; ANALYSIS_PREREG.md L8--9
-
-\paragraph{Sample.}
-The sealed analysis set is $n{=}61$ tasks:
-% AR.md L22--24
-11 anchored in the small-model post-training literature
-(Table~\ref{tab:lit})
-and 50 drawn from Super-NaturalInstructions~\citep{wang2022superni}
-by a pre-registered English-and-size filter, stratified on
-\texttt{Categories[0]}, seed 20260822, with \texttt{Source[0]}
-capped at 3.
-% ANALYSIS_PREREG_SUPPLEMENT.md L67--80, L104--108 (sample recipe, not AR.md)
-The intended literature layer was 13; BIRD and introductory APPS
-produced no go-label and are
+\subsection{Method}
+\label{sec:method}
+\paragraph{Protocol and sample.}
+Base model Qwen2.5-1.5B-Instruct~\citep{qwen25}, weights pinned at
+birth; LoRA rank 16, $\alpha=32$; sequence 4096; effective batch 16;
+pilot $10{\times}100$; full cap 8000 / 3 epochs; eval 200, greedy.
+% protocol_v2.yaml
+pass@8 ($k{=}8$) is a signal (1600 generations per task), never the
+label.
+% ANALYSIS_RESULTS_v2.md L53
+The sealed sample is $n{=}61$ (11 literature-layer + 50 SuperNI,
+seed 20260822): 53 registered go / 8 no-go (87\%).
+% AR.md L18, L24; v2 L7
+BIRD and APPS are out,
 \texttt{excluded for logistics, before any label existed}.
 % AR.md L27--30
-The sample contains 53 go and 8 no-go tasks
-($53/61\approx 86.9\%$).
+All numbers below that are not marked ``registered'' come from
+\texttt{ANALYSIS\_RESULTS\_v2} (CPU revision). Registered AUC/CI
+remain the v1 sealed row.
+
+\paragraph{Predictors.}
+The \emph{new main} classifier is leave-one-task-out logistic
+regression on the pre-decision vector only:
+$\Delta_{\mathrm{pilot}}$, base pass@1, base pass@8, headroom,
+pilot-loss descriptors, format-compliance of the \emph{base}
+split, and $\mathrm{train\_n}$.
+% ANALYSIS_PREREG_V2.md item 1; v2 L12--14
+$\mathrm{gen\_len.full.median}$ is reported as a post-hoc oracle
+upper bound and is \emph{not} used for decisions.
+% v2 L18, L36
+The registered 12-feature vector (which included that oracle and
+$\mathrm{full\_n}$) is kept as the registered row.
+% v2 L17; AR.md L15, L36
+Intervals are task-level bootstrap 95\% CIs (seed 20260820, $B{=}1000$).
+A label-permutation test re-runs full LOTO $N{=}1000$ times
+(seed 20260826).
+% v2 L15
+We also report L2-CV LOTO, a 3-feature model
+$(\Delta_{\mathrm{pilot}}, \mathrm{base\_pass1}, \mathrm{headroom})$,
+and a no-pass@8 feature set.
+% v2 L19--21
+Instruction embeddings (MiniLM, CPU) plus SuperNI
+Categories/Source are the semantic control; the original four
+scalars are the metadata control.
+% v2 L40--41
+McNemar exact tests on paired eval jsonl induce a three-way label
+(go / no-go / undetermined) as a revision-period analysis; the
+registered label stays $\Delta_{\mathrm{full}}>0$.
+% v2 L43--47
+Sensitivity (b) (drop EM-floor rows) is computed but \emph{not}
+used as supporting evidence (wide CI).
+% v2 L67; ANALYSIS_PREREG_V2.md
+
+\paragraph{Related work (lite).}
+Training-free transferability estimators (LogME, LEEP,
+TransRate) score a frozen representation against target labels
+without fine-tuning~\citep{you2021logme,nguyen2020leep,huang2021transrate}.
+We did \emph{not} run them: they select among source models, whereas
+we select among \emph{tasks} given one frozen recipe. That is a
+limitation and a listed future comparison.
+Multi-fidelity methods (successive halving, Hyperband, learning-curve
+extrapolation)~\citep{jamieson2016sh,li2018hyperband} treat cheap
+runs as a fidelity axis. Our probe is a \emph{single} fidelity
+point; a fidelity scan is future work.
+
+\subsection{Evidence}
+\label{sec:evidence}
+\paragraph{Finding 1: forging is the default \emph{in this regime}.}
+53 of 61 tasks (87\%) have $\Delta_{\mathrm{full}}>0$.
 % AR.md L18, L24
-Two long-context tasks (TyDiQA, SuperNI task419) entered after a
-disclosed OOM fallback that keeps effective batch 16
-($\Delta_{\mathrm{full}}+0.530$ / $+0.505$).
-% AR.md L61
-ARC-Easy is in-sample as PARTIAL with metrics present.
-% AR.md L26
+This is Qwen2.5-1.5B-Instruct, one LoRA recipe, greedy pass@1, gate
+$\Delta_{\mathrm{full}}>0$ --- not a claim about 7B models or full
+FT. 23 of 61 tasks have $\mathrm{base\_pass1}=0$; most of those
+gains are format unlock (the probe teaches the extractor), not
+new reasoning.
+% ANALYSIS_RESULTS_v2.md L56
 
-\paragraph{Predictors and intervals.}
-The primary model is a task-level leave-one-task-out logistic
-regression on the frozen numeric signal vector, including a
-pre-declared format-compliance scalar. Interval estimates are
-task-level bootstrap 95\% CIs on the LOTO pairs
-$(y_i,p_i)$. The secondary endpoint is Spearman
-$\rho(\Delta_{\mathrm{pilot}},\Delta_{\mathrm{full}})$. A
-text-only logistic that never sees a probe --- train size,
-\texttt{max\_new\_tokens}, prompt-style length, eval $n$ --- is
-the no-pilot control. Single-feature logistics are reported
-alongside. Cluster-level AUCs were pre-declared and are not
-estimable.
-% AR.md L32--45, L54; ANALYSIS_PREREG.md L13--38
-
-\subsection{Results}
-\label{sec:results}
-Four findings, in the frozen abstract order. Every interval below
-is the sealed task-level bootstrap 95\% CI.
-
-\paragraph{Finding 1: forging is the default.}
-Fine-tuning helps far more often than not: 53 of 61 tasks (87\%)
-have $\Delta_{\mathrm{full}}>0$.
-% AR.md L18 (87\% / 86.9\%); L24 (53 go / 8 no-go / n=61)
-Figure~\ref{fig:baserate} is the whole point: the gate
-$\Delta_{\mathrm{full}}>0$ is an easy event on this 1.5B
-protocol. The scarce class is no-go (8 of 61).
-% AR.md L18, L24
-
-\paragraph{Finding 2: pilots rank gain magnitude.}
+\paragraph{Finding 2: the probe ranks gain, and the ranking has
+budget value.}
 Spearman $\rho(\Delta_{\mathrm{pilot}},\Delta_{\mathrm{full}})=0.755$,
-CI $[0.595,0.864]$, which excludes 0.
+CI $[0.595,0.864]$ (registered secondary; excludes 0).
 % AR.md L16, L48
-Figure~\ref{fig:scatter} is upward-sloping: the probe ranks
-\emph{how much} full fine-tuning helps. GSM8K and MATH sit in the
-third quadrant (both deltas negative) and are labeled.
-Sensitivities (a) drop ARC-Easy and (b) drop EM-floor rows leave
-Spearman intact: $0.756$ $[0.594,0.873]$ and $0.771$
-$[0.608,0.878]$; both CIs exclude 0.
-% AR.md L49--50
+Partial $\rho$ controlling for $\mathrm{base\_pass1}$ is $0.832$:
+the ranking is not a restatement of base accuracy.
+% v2 L26
+Figure~\ref{fig:budget} is the operational plot. Ranking by
+$\Delta_{\mathrm{pilot}}$ and spending a budget of $K$ full
+fine-tunes captures $0.42$ / $0.72$ / $0.83$ of all positive-gain
+mass at $K{=}10,20,30$, against random $0.16$ / $0.33$ / $0.49$
+and oracle $0.45$ / $0.74$ / $0.90$.
+% v2 L62--65
+At $K{=}20$ the probe is within three points of oracle. 38\% of
+tasks have $|\Delta_{\mathrm{pilot}}|\le 0.02$ (a dumb probe);
+the ranking still works because the mass sits in the tails.
+% v2 L54
+Figure~\ref{fig:scatter} shows the same pairing; GSM8K/MATH sit in
+Q3 and the EM-floor quartet sits at the origin.
 
-\paragraph{Finding 3: the binary gate is not established.}
-The main LOTO logistic has AUC $0.755$ with CI $[0.500,0.929]$.
+\paragraph{Finding 3: the binary gate, three ways.}
+\textit{Registered row.} LOTO on the original 12-feature vector
+(including post-decision $\mathrm{gen\_len.full.median}$) has AUC
+$0.755$, CI $[0.500,0.929]$, covering 0.5 --- a negative under the
+honesty clause.
 % AR.md L15, L36
-The interval covers 0.5. Under the pre-registered honesty clause
-this is a negative result: a 10-example LoRA probe does not
-significantly classify whether full fine-tuning will raise greedy
-pass@1. The same verdict holds in the two pre-declared
-sensitivities, reported next to the main row rather than as
-afterthoughts (Table~\ref{tab:auc}):
-(a)~drop ARC-Easy, $n{=}60$, AUC $0.748$ $[0.487,0.920]$;
-(b)~drop EM-floor rows, $n{=}57$, AUC $0.778$ $[0.411,0.985]$.
-% AR.md L20, L37--38
-Both CIs cover 0.5. Single-feature $\Delta_{\mathrm{pilot}}$ is
-weaker ($0.663$ $[0.480,0.825]$); generation length is $0.818$
-$[0.505,0.986]$ and covers 0.5 at the edge.
-% AR.md L39, L43
+(The point $0.7547$ and Spearman $0.7553$ both print as $0.755$;
+that is a rounding coincidence, not one statistic.)
+\textit{Revision main row.} After dropping post-decision features,
+LOTO AUC $=0.844$, CI $[0.736,0.939]$, permutation $p{=}0.001$
+($N{=}1000$); bootstrap and permutation \emph{agree} (both reject
+chance).
+% v2 L14--16
+L2-CV is $0.875$ $[0.763,0.960]$; the 3-feature model is $0.767$
+$[0.649,0.870]$; dropping pass@8 still yields $0.837$
+$[0.721,0.930]$.
+% v2 L19--21
+The v1 negative is therefore better read as
+\emph{estimator-plus-leakage}, not as ``no signal.''
+\textit{Utility.} A perfect gate's upside versus always-forging is
+$|\sum \text{negative }\Delta|/\sum \text{positive }\Delta = 0.024$.
+% v2 L55
+Net always-forge is $+16.6$ pass points; oracle-forge is $+17.0$.
+McNemar three-way labels are 45 go / 2 no-go / 14 undetermined
+($\alpha{=}0.05$, uncorrected). With two significant negatives the
+determined-only AUC is not a serious gate estimate.
+% v2 L45--46
+Figure~\ref{fig:roc} is the pre-decision ROC.
 
-\paragraph{Finding 4: description features run below chance.}
-The text-only control, which never sees a probe or a run metric,
-has AUC $0.309$ $[0.045,0.622]$ --- below chance.
-% AR.md L17, L44
-Task size and prompt length do not explain go. Decision-relevant
-information exists only in actually running the pilot.
+\paragraph{Finding 4: you still have to run the probe.}
+Instruction-sentence embeddings plus SuperNI category/source have
+AUC $0.512$ $[0.255,0.746]$ --- chance.
+% v2 L41
+The old four-scalar ``text-only'' AUC $0.309$ is a
+\emph{metadata} control whose $\mathrm{eval\_n}$ is constantly 200;
+it is not evidence that description features run below chance in
+any semantic sense.
+% v2 L40
+Single-feature $\mathrm{steps\_to\_0.01}$ is $0.748$
+$[0.585,0.881]$ (does not cover 0.5; five tests, \emph{not}
+multiplicity-corrected).
+% v2 L35
+$\mathrm{gen\_len.full.median}$ is $0.818$ $[0.528,0.978]$ and is
+post-hoc.
+% v2 L36
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.92\linewidth]{budget_capture.png}
+  \caption{Budget allocation. $K$ full fine-tunes, fraction of
+    positive $\Delta_{\mathrm{full}}$ mass captured.
+    % v2 L58--65
+    }
+  \label{fig:budget}
+\end{figure}
 
 \begin{figure}[H]
   \centering
   \begin{minipage}[t]{0.48\linewidth}
     \centering
-    \includegraphics[width=\linewidth,height=1.55in,keepaspectratio]{base_rate.png}
-    \caption{Label base rate $53/61=86.9\%$.
-      % AR.md L18, L24
+    \includegraphics[width=\linewidth]{calibration_scatter.png}
+    \caption{Pilot vs.\ full, cropped. Diamonds: EM-floor rows.
+      % v2 L25; AR.md L52, L58
       }
-    \label{fig:baserate}
+    \label{fig:scatter}
   \end{minipage}\hfill
   \begin{minipage}[t]{0.48\linewidth}
     \centering
-    \includegraphics[width=\linewidth,height=1.55in,keepaspectratio]{calibration_scatter.png}
-    \caption{Pilot vs.\ full gain. GSM8K/MATH labeled in Q3.
-      % AR.md L16, L48 Spearman; L58 gsm8k Δ_full −0.230
+    \includegraphics[width=\linewidth]{roc_predecision.png}
+    \caption{LOTO ROC, pre-decision features.
+      % v2 L14
       }
-    \label{fig:scatter}
+    \label{fig:roc}
   \end{minipage}
 \end{figure}
 
 \begin{table}[H]
-  \caption{Primary LOTO AUC and pre-declared sensitivities.
-    Covering 0.5 is a negative under the honesty clause.}
+  \caption{Classifiers on the registered go label. v2 is
+    pre-decision. Registered 12-feat is the honesty-clause row.}
   \label{tab:auc}
   \centering
   \small
-  \begin{tabular}{l r c c c}
+  \begin{tabular}{l c c c}
     \toprule
-    Model & $n$ & AUC & 95\% CI & covers 0.5 \\
+    Model & AUC & 95\% CI & covers 0.5 \\
     \midrule
-    Main LOTO logistic
-      & 61 & 0.755 & $[0.500,0.929]$ & yes \\
+    Registered 12-feat (v1)
+      & 0.755 & $[0.500,0.929]$ & yes \\
       % AR.md L36
-    (a) drop ARC-Easy
-      & 60 & 0.748 & $[0.487,0.920]$ & yes \\
-      % AR.md L37
-    (b) drop EM-floor
-      & 57 & 0.778 & $[0.411,0.985]$ & yes \\
-      % AR.md L38
-    Text-only control
-      & 61 & 0.309 & $[0.045,0.622]$ & yes (below chance) \\
-      % AR.md L44
+    Pre-decision LOTO (v2 main)
+      & 0.844 & $[0.736,0.939]$ & no \\
+      % v2 L14
+    L2-CV pre-decision
+      & 0.875 & $[0.763,0.960]$ & no \\
+      % v2 L19
+    3-feat
+      & 0.767 & $[0.649,0.870]$ & no \\
+      % v2 L20
+    No pass@8
+      & 0.837 & $[0.721,0.930]$ & no \\
+      % v2 L21
+    Semantic (MiniLM)
+      & 0.512 & $[0.255,0.746]$ & yes \\
+      % v2 L41
+    Metadata (4 scalars)
+      & 0.309 & $[0.051,0.675]$ & yes \\
+      % v2 L40
     \bottomrule
   \end{tabular}
 \end{table}
 
-Table~\ref{tab:lit} reports the 11 literature-layer tasks that
-are in the sealed sample. BIRD and APPS are out
-(logistics exclude, no label).
-% AR.md L27--30
+Median wall
+$(\mathrm{S2}{+}\mathrm{S3})/(\mathrm{S4}{+}\mathrm{S5})=0.17$
+(IQR $[0.11,0.36]$); including S1, $0.53$ (IQR $[0.35,1.19]$).
+% v2 L51--52
+pass@8 is 1600 generations per task and is not required for the
+gate (no-pass@8 row).
+% v2 L21, L53
 
-\begin{table}[H]
-  \caption{Literature-layer tasks in $n{=}61$. Display rounding
-    matches the sealed reports; no new analysis.}
-    % Row sources: GATE_REPORT L11--13 (gsm8k/wino/spider);
-    % REPORT\_20260824T0024Z L56--63 (math..piqa);
-    % REPORT\_20260825T0851Z L16--18 (tydiqa);
-    % gsm8k $\Delta_{\mathrm{full}}$ also AR.md L58;
-    % tydiqa $\Delta_{\mathrm{full}}$ also AR.md L61;
-    % JSON companion: ANALYSIS\_RESULTS.json main\_bundle.delta\_*.
-  \label{tab:lit}
-  \centering
-  \scriptsize
-  \begin{tabular}{l r r r}
-    \toprule
-    Task & base & $\Delta_{\mathrm{pilot}}$ & $\Delta_{\mathrm{full}}$ \\
-    \midrule
-    GSM8K         & 0.690 & $-0.335$ & $-0.230$ \\ % GATE L11; AR.md L58
-    WinoGrande    & 0.560 & $-0.055$ & $+0.190$ \\ % GATE L12
-    Spider        & 0.495 & $-0.155$ & $+0.150$ \\ % GATE L13
-    MATH          & 0.355 & $-0.155$ & $-0.160$ \\ % REPORT_0024Z L56
-    MBPP          & 0.055 & $-0.030$ & $+0.000$ \\ % L57
-    DROP          & 0.055 & $+0.275$ & $+0.535$ \\ % L58
-    TyDiQA        & 0.170 & $+0.260$ & $+0.530$ \\ % REPORT_0851Z L16--18; AR.md L61
-    ARC-Easy      & 0.850 & $-0.120$ & $+0.035$ \\ % REPORT_0024Z L60; AR.md L26 PARTIAL
-    ARC-Challenge & 0.780 & $-0.090$ & $+0.020$ \\ % L61
-    HellaSwag     & 0.650 & $-0.140$ & $+0.180$ \\ % L62
-    PIQA          & 0.765 & $-0.015$ & $+0.065$ \\ % L63
-    \bottomrule
-  \end{tabular}
-\end{table}
-
-\FloatBarrier
-
-\subsection{Discussion}
-\label{sec:discussion}
-The upstream decision --- is this task worth fine-tuning? --- is
-still made by intuition or by paying for the full run. A cheap,
-execution-based probe that ranked tasks would change how
-small-model post-training budgets are allocated. The measurements
-above show that such a probe exists as a ranker and does not
-exist as a binary gate, in a regime where forging is already the
-default.
-
-The honest reading is split. If the operational question is
-\emph{whether} to run full fine-tuning, the 10-shot probe is not
-a significant classifier (Finding~3). If the question is \emph{how
-large} the full-training gain will be, the same probe ranks
-tasks (Finding~2). Those two sentences should not be collapsed:
-the probe is a ranker, not a stoplight.
-
-Finding~1 is the mechanism of Finding~3, not a nuisance. With
-eight negatives, AUC is under-powered for a hard gate.
-% AR.md L24 8 no-go
-A classifier that always predicts go is already strong in
-accuracy and useless in ROC. Missing negatives include two
-logistics exclusions: BIRD never received metrics; APPS never
-received $\Delta_{\mathrm{full}}$.
-% AR.md L27--30
-APPS reached base pass@1 $0.0$ / pass@8 $0.005$ before the
-full-training OOM; that floor is a limitations footnote, not a
-sample row.
-% AR.md L30; REPORT_20260825T1312Z / S5 footnote (not a sealed Δ_full)
-
-\paragraph{Failure modes in the sample.}
-Format overwrite: GSM8K $\Delta_{\mathrm{full}}=-0.230$ despite
-in-domain training.
-% AR.md L58
-The base already emits the dataset's \texttt{\#\#\#\#} format;
-full training saturates format while reasoning degrades. MATH
-sits in the same quadrant
-($\Delta_{\mathrm{pilot}}=-0.155$, $\Delta_{\mathrm{full}}=-0.160$).
-% REPORT_20260824T0024Z L56; AR.md L58 names gsm8k/math as the pair
-Exact-match floor: four SuperNI rows have $\Delta_{\mathrm{full}}=0$
-because the matcher never hits
-(\texttt{task071}, \texttt{task1553}, \texttt{task236},
-\texttt{task455});
-% AR.md L52, L59
-sensitivity (b) drops them and the negative gate remains.
-% AR.md L38
-OOM disclosure: TyDiQA and task419 are in-sample only because of
-the $1{\times}16$ fallback (effective batch still 16).
-% AR.md L61
-WinoGrande, often treated as a weak-gain control in this size
-class, shows $\Delta_{\mathrm{full}}=+0.190$ here --- a reverse
-relative to that prior, not a new endpoint.
-% GATE_REPORT L12; REPORT_20260824T0024Z L121
-
-\paragraph{Related work (lite).}
-Rectified Scaling Law~\citep{lin2024rectified} predicts
-pretraining loss versus compute in order to choose which model
-to fine-tune; we instead ask, for a fixed small model, which
-\emph{tasks} are worth fine-tuning at all. The Fine-Tuning
-Trap~\citep{nair2026trap} documents negative transfer of PEFT on
-sub-1B mathematical reasoning; our GSM8K/MATH third-quadrant
-points are a task-level counterpart under a frozen LoRA recipe.
-Super-NaturalInstructions~\citep{wang2022superni} supplies the
-50-task slice; CodeS~\citep{codes} is the text-to-SQL line that
-motivates Spider as an anchor.
-
-We do not add features, change the go threshold, or reopen BIRD
-or APPS. Cluster AUCs stay unreported as estimates: the choice
-cluster is all-go; the math cluster has $n{=}2$.
-% AR.md L54
+\subsection{Primary Result}
+\label{sec:primary}
+In this regime the probe is a \emph{ranker with measured budget
+value}, not a stoplight worth building operations around.
+Spending $K{=}20$ full slots by $\Delta_{\mathrm{pilot}}$ harvests
+72\% of all positive gain, near the oracle 74\%.
+% v2 L64
+The registered binary endpoint was negative once post-decision
+features were in the vector; after they are removed the LOTO gate
+is significant --- and still almost useless as a \emph{decision},
+because a perfect gate saves 2.4\% of positive-gain mass relative
+to always forging.
+% v2 L14, L55
+The 87\% base rate, 23/61 zero-base format unlocks, and McNemar's
+two significant negatives are the same fact: no-go is scarce.
+Instruction text does not replace the probe (semantic AUC 0.51).
+% v2 L41, L56
+We do not reopen BIRD/APPS, do not move the registered go
+threshold, and do not treat sensitivity (b) as evidence.

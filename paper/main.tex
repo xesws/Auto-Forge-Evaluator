@@ -39,39 +39,28 @@
 \maketitle
 
 \begin{abstract}
-Fine-tuning a small specialist model is the default path to
-cheap task-specific capability, yet the upstream decision --- is
-this task worth fine-tuning at all? --- is still made by intuition
-or by paying for the full training run. We ask whether ten
-labeled examples can answer it in advance. Under a single frozen
-protocol (Qwen2.5-1.5B-Instruct, fixed LoRA recipe and budgets,
-greedy decoding, execution-based verifiers), we measure 61 tasks
-% AR.md L24 n=61
---- 11 anchored in the small-model post-training literature and 50
-drawn by a pre-registered filter from Super-NaturalInstructions ---
-pairing a ten-example pilot with a full fine-tune whose measured
-gain serves as ground truth. All analyses were pre-registered.
-We find: (1) fine-tuning helps far more often than not --- 53 of
-61 tasks (87\%) show positive full-training gains, making ``forge''
-% AR.md L18 87% / 86.9%; L24 53 go / 61; abstract freeze keeps 87\%
-the empirical default in this regime; (2) pilot signals
-significantly rank gain magnitude (Spearman 0.755, 95\% CI
-[0.60, 0.86]), enabling budget allocation by ranking;
-% AR.md L16,L48 Spearman 0.755 [0.595, 0.864]; abstract freeze rounds CI to [0.60, 0.86]
-(3) the
-pre-registered binary go/no-go endpoint is not established
-(leave-one-task-out AUC 0.755, bootstrap CI [0.50, 0.93]), a
-% AR.md L15,L36 AUC 0.755 [0.500, 0.929]; abstract freeze rounds CI to [0.50, 0.93]
-power limit rooted in the empirical scarcity of no-go tasks
-itself; and (4) description-only features predict below chance
-(AUC 0.31) --- the decision-relevant information exists only in
-% AR.md L17,L44 text-only 0.309 [0.045, 0.622]; abstract freeze rounds to 0.31
-actually running the pilot. We characterize the no-go tail,
-including negative transfer on heavily post-trained bases
-(GSM8K $-0.23$ despite in-domain training), and release the
-% AR.md L58 gsm8k Δ_full −0.230; abstract freeze rounds to −0.23
-benchmark, protocol, and all sealed artifacts.
-These sealed measurements and pre-registered analyses were produced by an autonomous discover-pilot-decide-train-validate system; without that system's contribution the 61-task ground-truth table would not exist.
+% Operator-owned; drafted after ANALYSIS_RESULTS_v2. Please rewrite.
+Fine-tuning a small specialist is cheap, but only after one
+decides which tasks to train. Under one frozen protocol
+(Qwen2.5-1.5B-Instruct, fixed LoRA, greedy pass@1) we pair a
+ten-example probe with a full fine-tune on 61 tasks (53/61 go,
+87\% in this regime).
+% AR.md L18, L24
+The probe \emph{ranks} gain (Spearman $0.755$, CI $[0.595,0.864]$)
+and a budget of $K{=}20$ full slots chosen by $\Delta_{\mathrm{pilot}}$
+captures 72\% of all positive-gain mass (random 33\%, oracle 74\%).
+% AR.md L16, L48; v2 L64
+The registered binary LOTO, which included a post-decision
+feature, is negative (AUC $0.755$, CI $[0.500,0.929]$ covers 0.5).
+% AR.md L15, L36
+After removing leakage the revision LOTO is $0.844$
+$[0.736,0.939]$ (permutation $p{=}0.001$), but a perfect gate
+saves only 2.4\% of positive-gain mass versus always forging.
+% v2 L14--16, L55
+Instruction embeddings are chance (AUC $0.51$); 23/61 tasks have
+base pass@1 $=0$ (format unlock). The table was produced by an
+autonomous discover-pilot-decide-train-validate harness.
+% v2 L41, L56
 \end{abstract}
 
 \noindent\textbf{Keywords:} fine-tuning, evaluation, small language models
@@ -83,21 +72,10 @@ These sealed measurements and pre-registered analyses were produced by an autono
 \input{part3}
 
 \clearpage
-\appendix
-
-\section{Reproducibility Statement}
-The protocol file, pre-registration, and the sealed 61-row
-% AR.md L24
-per-task table are packed in the supplementary archive.
-Protocol hyperparameters were never edited after freeze.
-Dataset papers for the literature-layer table:
+% Reproducibility statement lives in supplementary (9-page body
+% = Parts 1--3 only; CFP silent on NeurIPS checklist --- included
+% after references under the strict reading).
 \nocite{gsm8k,winogrande,spider,math,mbpp,drop,tydiqa,arc,hellaswag,piqa}
-Disclosed run-level exceptions (OOM fallback on two tasks;
-% AR.md L61
-one PARTIAL in-sample row) are listed in Setup and in the
-% AR.md L26 arc_easy
-supplementary protocol notes. Figures in Part~1 are redrawn
-from the frozen plot payload; they are not a new analysis.
 
 \section{Disclosure Statement}
 
@@ -127,5 +105,8 @@ two attestations below are therefore left unchecked.
 
 \bibliographystyle{plainnat}
 \bibliography{refs}
+
+\clearpage
+\input{checklist}
 
 \end{document}
