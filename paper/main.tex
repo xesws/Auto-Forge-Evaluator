@@ -39,28 +39,53 @@
 \maketitle
 
 \begin{abstract}
-% Operator-owned; drafted after ANALYSIS_RESULTS_v2. Please rewrite.
-Fine-tuning a small specialist is cheap, but only after one
-decides which tasks to train. Under one frozen protocol
-(Qwen2.5-1.5B-Instruct, fixed LoRA, greedy pass@1) we pair a
-ten-example probe with a full fine-tune on 61 tasks (53/61 go,
-87\% in this regime).
+% Operator-owned. Rewritten on the ADDENDUM spine: the registered
+% negative stays primary; the revision gain is attributed correctly.
+Fine-tuning a small specialist is the default path to cheap
+task-specific capability, yet the upstream decision --- is this
+task worth fine-tuning at all? --- is still made by intuition or
+by paying for the full run. Under one frozen protocol
+(Qwen2.5-1.5B-Instruct, fixed LoRA recipe and budgets, greedy
+decoding, execution-based verifiers) we pair a ten-example pilot
+with a full fine-tune on 61 tasks --- 11 anchored in the
+% AR.md L24 n=61
+small-model post-training literature, 50 drawn by a pre-registered
+filter from Super-NaturalInstructions --- and take the measured
+gain as ground truth. Fine-tuning helps on 53 of 61 tasks (87\%),
 % AR.md L18, L24
-The probe \emph{ranks} gain (Spearman $0.755$, CI $[0.595,0.864]$)
-and a budget of $K{=}20$ full slots chosen by $\Delta_{\mathrm{pilot}}$
-captures 72\% of all positive-gain mass (random 33\%, oracle 74\%).
-% AR.md L16, L48; v2 L64
-The registered binary LOTO, which included a post-decision
-feature, is negative (AUC $0.755$, CI $[0.500,0.929]$ covers 0.5).
-% AR.md L15, L36
-After removing leakage the revision LOTO is $0.844$
-$[0.736,0.939]$ (permutation $p{=}0.001$), but a perfect gate
-saves only 2.4\% of positive-gain mass versus always forging.
-% v2 L14--16, L55
-Instruction embeddings are chance (AUC $0.51$); 23/61 tasks have
-base pass@1 $=0$ (format unlock). The table was produced by an
-autonomous discover-pilot-decide-train-validate harness.
-% v2 L41, L56
+but 23 tasks start at pass@1 $=0$, where the gain is format unlock
+% v2 L56
+rather than new capability. The pilot \emph{ranks} gain magnitude
+(Spearman $0.755$, CI $[0.60,0.86]$), and the ranking has budget
+% AR.md L16, L48; abstract rounds CI to [0.60, 0.86]
+value: spending $K{=}20$ full fine-tunes in pilot order captures
+$0.72$ of all positive-gain mass, against $0.33$ random and $0.74$
+% v2 L64
+oracle. The pre-registered binary go/no-go endpoint is published
+as a negative (leave-one-task-out AUC $0.755$, CI $[0.50,0.93]$).
+% AR.md L15, L36; abstract rounds CI to [0.50, 0.93]
+A declared revision locates the mechanism: removing the one
+post-decision feature does \emph{not} rescue it ($0.663$,
+CI $[0.43,0.84]$), while a three-feature pre-decision model does
+% ADDENDUM section 3
+($0.767$, CI $[0.65,0.88]$, permutation $p{=}0.004$) --- the
+registered negative was an over-parameterised estimator, not an
+absence of signal. Binary framing was in any case the wrong
+target: a \emph{perfect} gate is worth $2.4\%$ over always
+% v2 L55
+forging, and the probe is not free (median $0.17$ of full
+training-plus-eval cost, $0.53$ including the base evaluation it
+% v2 L51--52
+needs). Instruction embeddings predict at chance ($0.512$): you
+% v2 L41
+have to run the probe. We characterise the no-go tail, including
+negative transfer on heavily post-trained bases (GSM8K $-0.23$
+% AR.md L58
+despite in-domain training), and release the benchmark, protocol,
+analysis code, and all sealed artifacts. Every measurement here
+was produced by an autonomous
+discover--pilot--decide--train--validate system; without it the
+61-task ground-truth table would not exist.
 \end{abstract}
 
 \noindent\textbf{Keywords:} fine-tuning, evaluation, small language models
@@ -84,9 +109,13 @@ The 61-row experimental table was produced by a frozen Python
 harness on a single serial GPU queue (protocol v2; base model
 Qwen2.5-1.5B-Instruct at the pinned revision in the protocol
 file). An LLM coding agent packed tasks, monitored the queue,
-diagnosed failures, executed the pre-registered analysis, and
-drafted Parts~1--3 of this manuscript, including figures generated
-from the frozen plot payload. The coding agent's model identity is
+diagnosed failures, executed the pre-registered analysis and the
+declared CPU-only revision, and drafted Parts~1--3 of this
+manuscript, including figures generated from the frozen plot
+payload. The revision's own attribution error was found by an
+independent re-implementation of the analysis and is disclosed as
+a late declaration in the revision contract; no experimental
+number was recomputed on new hardware. The coding agent's model identity is
 omitted here to preserve double-blind review and will be named to
 the program chairs. No experimental number in Part~1 was computed
 outside the sealed analysis script.

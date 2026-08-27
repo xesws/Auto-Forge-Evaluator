@@ -247,8 +247,9 @@ started early --- the log names the mix rather than rewriting it.
 
 \subsection{Verification}
 \label{p2:verify}
-Four checks sit under every sealed row, and a fifth sits under the
-paper's numbers.
+Four checks sit under every sealed row, a fifth sits under the
+paper's numbers, and a sixth --- independent re-implementation ---
+is the one that actually caught something.
 
 Gates (automatic, do not block the queue): base unparseable
 $<5\%$; pilot loss must fall; the systems block must be complete
@@ -269,6 +270,26 @@ archive (adapters and isolated dirs included) has sha256
 % ledger 2026-08-25 full tar
 Figures in Part~1 are redrawn from a frozen plot payload, not from
 a second analysis.
+
+\paragraph{The check that caught a mis-attribution.}
+The revision's headline --- ``after removing the post-decision
+feature the gate is significant'' --- survived code review and
+survived rerunning the authors' own script. It did not survive an
+\emph{independent} re-implementation of the LOTO pipeline: that
+reproduced AUC $0.663$, not $0.844$. A cell-by-cell diff of the
+two $61{\times}10$ design matrices found exactly one disagreement,
+a format-compliance value for MATH, and a decomposition showed
+that removing leakage moves the AUC \emph{down} while that single
+cell moves it up by $0.182$.
+% ADDENDUM section 1, section 2
+The lesson is narrow and reusable: re-running the pipeline
+verifies determinism, not correctness, and neither a frozen
+protocol nor a written contract detects a feature-definition
+change that both the code and its author believe is a bug fix.
+Only a second implementation compared at the level of the design
+matrix does. The finding is disclosed in
+\texttt{ANALYSIS\_PREREG\_V2} as a late declaration and the paper's
+claim was moved onto a model invariant to it.
 
 The analysis contract --- go iff $\Delta_{\mathrm{full}}>0$,
 task-level LOTO logistic, Spearman on the two deltas, text-only

@@ -1,0 +1,118 @@
+\begin{thebibliography}{16}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Austin et~al.(2021)Austin, Odena, Nye, Bosma, Michalewski, Dohan,
+  Jiang, Cai, Terry, Le, and Sutton]{mbpp}
+Jacob Austin, Augustus Odena, Maxwell Nye, Maarten Bosma, Henryk Michalewski,
+  David Dohan, Ellen Jiang, Carrie Cai, Michael Terry, Quoc Le, and Charles
+  Sutton.
+\newblock Program synthesis with large language models.
+\newblock \emph{arXiv preprint arXiv:2108.07732}, 2021.
+
+\bibitem[Bisk et~al.(2019)Bisk, Zellers, Le~Bras, Gao, and Choi]{piqa}
+Yonatan Bisk, Rowan Zellers, Ronan Le~Bras, Jianfeng Gao, and Yejin Choi.
+\newblock {PIQA}: Reasoning about physical commonsense in natural language.
+\newblock \emph{arXiv preprint arXiv:1911.11641}, 2019.
+
+\bibitem[Clark et~al.(2020)Clark, Choi, Collins, Garrette, Kwiatkowski,
+  Nikolaev, and Palomaki]{tydiqa}
+Jonathan~H. Clark, Eunsol Choi, Michael Collins, Dan Garrette, Tom Kwiatkowski,
+  Vitaly Nikolaev, and Jennimaria Palomaki.
+\newblock {TyDi QA}: A benchmark for information-seeking question answering in
+  typologically diverse languages.
+\newblock \emph{arXiv preprint arXiv:2003.05002}, 2020.
+
+\bibitem[Clark et~al.(2018)Clark, Cowhey, Etzioni, Khot, Sabharwal, Schoenick,
+  and Tafjord]{arc}
+Peter Clark, Isaac Cowhey, Oren Etzioni, Tushar Khot, Ashish Sabharwal, Carissa
+  Schoenick, and Oyvind Tafjord.
+\newblock Think you have solved question answering? try {ARC}, the {AI2}
+  reasoning challenge.
+\newblock \emph{arXiv preprint arXiv:1803.05457}, 2018.
+
+\bibitem[Cobbe et~al.(2021)Cobbe, Kosaraju, Bavarian, Chen, Jun, Kaiser,
+  Plappert, Tworek, Hilton, Nakano, Hesse, and Schulman]{gsm8k}
+Karl Cobbe, Vineet Kosaraju, Mohammad Bavarian, Mark Chen, Heewoo Jun, Lukasz
+  Kaiser, Matthias Plappert, Jerry Tworek, Jacob Hilton, Reiichiro Nakano,
+  Christopher Hesse, and John Schulman.
+\newblock Training verifiers to solve math word problems.
+\newblock \emph{arXiv preprint arXiv:2110.14168}, 2021.
+
+\bibitem[Dua et~al.(2019)Dua, Wang, Dasigi, Stanovsky, Singh, and
+  Gardner]{drop}
+Dheeru Dua, Yizhong Wang, Pradeep Dasigi, Gabriel Stanovsky, Sameer Singh, and
+  Matt Gardner.
+\newblock {DROP}: A reading comprehension benchmark requiring discrete
+  reasoning over paragraphs.
+\newblock \emph{arXiv preprint arXiv:1903.00161}, 2019.
+
+\bibitem[Hendrycks et~al.(2021)Hendrycks, Burns, Kadavath, Arora, Basart, Tang,
+  Song, and Steinhardt]{math}
+Dan Hendrycks, Collin Burns, Saurav Kadavath, Akul Arora, Steven Basart, Eric
+  Tang, Dawn Song, and Jacob Steinhardt.
+\newblock Measuring mathematical problem solving with the {MATH} dataset.
+\newblock \emph{arXiv preprint arXiv:2103.03874}, 2021.
+
+\bibitem[Huang et~al.(2021)Huang, Wei, Rong, Yang, and
+  Huang]{huang2021transrate}
+Long-Kai Huang, Ying Wei, Yu~Rong, Qiang Yang, and Junzhou Huang.
+\newblock Frustratingly easy transferability estimation.
+\newblock \emph{arXiv preprint arXiv:2106.09362}, 2021.
+
+\bibitem[Jamieson and Talwalkar(2016)]{jamieson2016sh}
+Kevin Jamieson and Ameet Talwalkar.
+\newblock Non-stochastic best arm identification and hyperparameter
+  optimization.
+\newblock \emph{arXiv preprint arXiv:1502.07943}, 2016.
+
+\bibitem[Li et~al.(2018)Li, Jamieson, DeSalvo, Rostamizadeh, and
+  Talwalkar]{li2018hyperband}
+Lisha Li, Kevin Jamieson, Giulia DeSalvo, Afshin Rostamizadeh, and Ameet
+  Talwalkar.
+\newblock Hyperband: A novel bandit-based approach to hyperparameter
+  optimization.
+\newblock \emph{arXiv preprint arXiv:1603.06560}, 2018.
+
+\bibitem[Nguyen et~al.(2020)Nguyen, Hassner, Seeger, and
+  Archambeau]{nguyen2020leep}
+Cuong~V. Nguyen, Tal Hassner, Matthias Seeger, and Cedric Archambeau.
+\newblock {LEEP}: A new measure to evaluate transferability of learned
+  representations.
+\newblock \emph{arXiv preprint arXiv:2002.12462}, 2020.
+
+\bibitem[{Qwen Team}(2024)]{qwen25}
+{Qwen Team}.
+\newblock {Qwen2.5} technical report.
+\newblock \emph{arXiv preprint arXiv:2412.15115}, 2024.
+
+\bibitem[Sakaguchi et~al.(2019)Sakaguchi, Le~Bras, Bhagavatula, and
+  Choi]{winogrande}
+Keisuke Sakaguchi, Ronan Le~Bras, Chandra Bhagavatula, and Yejin Choi.
+\newblock {WinoGrande}: An adversarial winograd schema challenge at scale.
+\newblock \emph{arXiv preprint arXiv:1907.10641}, 2019.
+
+\bibitem[You et~al.(2021)You, Liu, Wang, and Long]{you2021logme}
+Kaichao You, Yong Liu, Jianmin Wang, and Mingsheng Long.
+\newblock {LogME}: Practical assessment of pre-trained models for transfer
+  learning.
+\newblock \emph{arXiv preprint arXiv:2102.11005}, 2021.
+
+\bibitem[Yu et~al.(2018)Yu, Zhang, Yang, Yasunaga, Wang, Li, Ma, Li, Yao,
+  Roman, Zhang, and Radev]{spider}
+Tao Yu, Rui Zhang, Kai Yang, Michihiro Yasunaga, Dongxu Wang, Zifan Li, James
+  Ma, Irene Li, Qingning Yao, Shanelle Roman, Zilin Zhang, and Dragomir Radev.
+\newblock Spider: A large-scale human-labeled dataset for complex and
+  cross-domain semantic parsing and text-to-{SQL} task.
+\newblock \emph{arXiv preprint arXiv:1809.08887}, 2018.
+
+\bibitem[Zellers et~al.(2019)Zellers, Holtzman, Bisk, Farhadi, and
+  Choi]{hellaswag}
+Rowan Zellers, Ari Holtzman, Yonatan Bisk, Ali Farhadi, and Yejin Choi.
+\newblock {HellaSwag}: Can a machine really finish your sentence?
+\newblock \emph{arXiv preprint arXiv:1905.07830}, 2019.
+
+\end{thebibliography}

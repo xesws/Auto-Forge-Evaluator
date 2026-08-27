@@ -16,8 +16,11 @@ non-significant AUC is published as a negative.
 % ANALYSIS_PREREG.md L8--41
 A later, declared revision (v2) asks the same questions after
 removing post-decision features from the classifier, and quantifies
-the \emph{utility} of a perfect gate versus always forging.
-% ANALYSIS_PREREG_V2.md; ANALYSIS_RESULTS_v2.md
+the \emph{utility} of a perfect gate versus always forging. A
+correction to that revision (the addendum) separates the effect of
+removing leakage from the effect of one declared bug fix; we
+report both.
+% ANALYSIS_PREREG_V2.md; ANALYSIS_RESULTS_v2.md; ADDENDUM
 
 \subsection{Method}
 \label{sec:method}
@@ -36,8 +39,10 @@ BIRD and APPS are out,
 \texttt{excluded for logistics, before any label existed}.
 % AR.md L27--30
 All numbers below that are not marked ``registered'' come from
-\texttt{ANALYSIS\_RESULTS\_v2} (CPU revision). Registered AUC/CI
-remain the v1 sealed row.
+\texttt{ANALYSIS\_RESULTS\_v2} and its correction file
+\texttt{ANALYSIS\_RESULTS\_v2\_ADDENDUM} (CPU revision; the
+addendum supersedes the v2 attribution wherever they differ).
+Registered AUC/CI remain the v1 sealed row.
 
 \paragraph{Predictors.}
 The \emph{new main} classifier is leave-one-task-out logistic
@@ -54,8 +59,26 @@ $\mathrm{full\_n}$) is kept as the registered row.
 % v2 L17; AR.md L15, L36
 Intervals are task-level bootstrap 95\% CIs (seed 20260820, $B{=}1000$).
 A label-permutation test re-runs full LOTO $N{=}1000$ times
-(seed 20260826).
-% v2 L15
+(seed 20260826) and is reported as
+$(1+\#\{\rho_{\mathrm{perm}}\ge\rho_{\mathrm{obs}}\})/(1+N)$.
+% ADDENDUM section 3 (v2 printed the naive #/N)
+
+\paragraph{One declared bug fix, found after the revision contract.}
+The revision code also changed one feature \emph{definition}: the
+v1 format-compliance scalar $1-\mathrm{unparseable}/n$ silently
+returns $1.0$ for any task whose compliance block carries no
+\texttt{unparseable} key. Exactly two of the 61 tasks are like
+that --- GSM8K, which v1 special-cased, and MATH, which it missed.
+The revision adds the matching MATH branch
+($\mathrm{boxed}/n=0.55$).
+% ADDENDUM section 1
+This is a bug fix, not a task-specific choice, but it was found
+\emph{after} \texttt{ANALYSIS\_PREREG\_V2} was written, it is not
+one of that page's declared items, and it lands on one of only two
+substantive negatives. We therefore report every affected number
+under both definitions and never fold its effect into
+``removing leakage'' (Table~\ref{tab:auc}).
+% ANALYSIS_PREREG_V2.md R1-9; ADDENDUM section 2
 We also report L2-CV LOTO, a 3-feature model
 $(\Delta_{\mathrm{pilot}}, \mathrm{base\_pass1}, \mathrm{headroom})$,
 and a no-pass@8 feature set.
@@ -101,9 +124,11 @@ budget value.}
 Spearman $\rho(\Delta_{\mathrm{pilot}},\Delta_{\mathrm{full}})=0.755$,
 CI $[0.595,0.864]$ (registered secondary; excludes 0).
 % AR.md L16, L48
-Partial $\rho$ controlling for $\mathrm{base\_pass1}$ is $0.832$:
-the ranking is not a restatement of base accuracy.
-% v2 L26
+Partial $\rho$ controlling for $\mathrm{base\_pass1}$ is $0.832$
+(residualise the raw deltas on base, then rank; the fully
+rank-based partial formula gives $0.777$ --- either way the
+ranking is not a restatement of base accuracy).
+% v2 L26; analysis_v2.py::partial_spearman
 Figure~\ref{fig:budget} is the operational plot. Ranking by
 $\Delta_{\mathrm{pilot}}$ and spending a budget of $K$ full
 fine-tunes captures $0.42$ / $0.72$ / $0.83$ of all positive-gain
@@ -125,17 +150,31 @@ honesty clause.
 % AR.md L15, L36
 (The point $0.7547$ and Spearman $0.7553$ both print as $0.755$;
 that is a rounding coincidence, not one statistic.)
-\textit{Revision main row.} After dropping post-decision features,
-LOTO AUC $=0.844$, CI $[0.736,0.939]$, permutation $p{=}0.001$
-($N{=}1000$); bootstrap and permutation \emph{agree} (both reject
-chance).
-% v2 L14--16
-L2-CV is $0.875$ $[0.763,0.960]$; the 3-feature model is $0.767$
-$[0.649,0.870]$; dropping pass@8 still yields $0.837$
-$[0.721,0.930]$.
-% v2 L19--21
-The v1 negative is therefore better read as
-\emph{estimator-plus-leakage}, not as ``no signal.''
+\textit{Revision rows, decomposed.} Dropping the post-decision
+features \emph{lowers} the AUC to $0.663$, CI $[0.433,0.839]$,
+permutation $p{=}0.057$ --- still a negative. The jump to $0.844$
+$[0.733,0.943]$, $p{=}0.002$, comes from the declared MATH
+format-compliance fix above: one cell of the $61\times 10$ design
+matrix, worth $+0.182$ AUC on its own.
+% ADDENDUM section 2, section 3
+The leaked feature was \emph{helping} the registered row, so the
+v1 negative cannot be read as ``leakage.''
+It is read correctly as \emph{over-parameterisation}: 12 features
+against 8 negatives. The parsimonious pre-decision model ---
+three features, no format-compliance term, and therefore invariant
+to both the leak and the fix --- is significant at $0.767$
+$[0.646,0.879]$, $p{=}0.004$.
+% ADDENDUM section 2, section 3
+That row, not $0.844$, is the defensible pre-decision estimate.
+L2-CV ($0.875$) and the no-pass@8 set ($0.837$) inherit the same
+$+0.15$ dependence on the fix and are reported with their
+unfixed values in Table~\ref{tab:auc}.
+% ADDENDUM section 2
+None of these rows is stable at the second decimal: dropping a
+single substantive negative moves the $0.844$ model to $0.685$
+(MATH) or $0.714$ (GSM8K), across a jackknife range
+$[0.685,0.871]$.
+% ADDENDUM section 4
 \textit{Utility.} A perfect gate's upside versus always-forging is
 $|\sum \text{negative }\Delta|/\sum \text{positive }\Delta = 0.024$.
 % v2 L55
@@ -194,36 +233,39 @@ post-hoc.
 \end{figure}
 
 \begin{table}[H]
-  \caption{Classifiers on the registered go label. v2 is
-    pre-decision. Registered 12-feat is the honesty-clause row.}
+  \caption{Classifiers on the registered go label. ``fix'' is the
+    declared MATH format-compliance branch; rows that contain no
+    compliance term are invariant to it. The 3-feature row is the
+    only significant pre-decision model that depends on neither
+    the leak nor the fix.}
   \label{tab:auc}
   \centering
   \small
-  \begin{tabular}{l c c c}
+  \begin{tabular}{l c c c c}
     \toprule
-    Model & AUC & 95\% CI & covers 0.5 \\
+    Model & AUC (with fix) & 95\% CI & no fix & covers 0.5 \\
     \midrule
-    Registered 12-feat (v1)
-      & 0.755 & $[0.500,0.929]$ & yes \\
-      % AR.md L36
-    Pre-decision LOTO (v2 main)
-      & 0.844 & $[0.736,0.939]$ & no \\
-      % v2 L14
+    Registered 12-feat (v1, leaked)
+      & 0.755 & $[0.500,0.929]$ & 0.755 & yes \\
+      % AR.md L36; ADDENDUM section 2 (invariant)
+    Pre-decision 10-feat
+      & 0.844 & $[0.733,0.943]$ & \textbf{0.663} & no \\
+      % ADDENDUM section 2, section 3
     L2-CV pre-decision
-      & 0.875 & $[0.763,0.960]$ & no \\
-      % v2 L19
-    3-feat
-      & 0.767 & $[0.649,0.870]$ & no \\
-      % v2 L20
+      & 0.875 & $[0.763,0.960]$ & 0.722 & no \\
+      % v2 L19; ADDENDUM section 2
+    \textbf{3-feat (invariant)}
+      & \textbf{0.767} & $\mathbf{[0.646,0.879]}$ & \textbf{0.767} & no \\
+      % ADDENDUM section 2, section 3
     No pass@8
-      & 0.837 & $[0.721,0.930]$ & no \\
-      % v2 L21
+      & 0.837 & $[0.721,0.930]$ & 0.675 & no \\
+      % v2 L21; ADDENDUM section 2
     Semantic (MiniLM)
-      & 0.512 & $[0.255,0.746]$ & yes \\
-      % v2 L41
+      & 0.512 & $[0.255,0.746]$ & 0.512 & yes \\
+      % v2 L41 (no compliance term)
     Metadata (4 scalars)
-      & 0.309 & $[0.051,0.675]$ & yes \\
-      % v2 L40
+      & 0.309 & $[0.051,0.675]$ & 0.309 & yes \\
+      % v2 L40 (no compliance term)
     \bottomrule
   \end{tabular}
 \end{table}
@@ -243,12 +285,13 @@ value}, not a stoplight worth building operations around.
 Spending $K{=}20$ full slots by $\Delta_{\mathrm{pilot}}$ harvests
 72\% of all positive gain, near the oracle 74\%.
 % v2 L64
-The registered binary endpoint was negative once post-decision
-features were in the vector; after they are removed the LOTO gate
-is significant --- and still almost useless as a \emph{decision},
+The registered binary endpoint is negative and stays negative
+after the post-decision feature is removed ($0.663$); only a
+parsimonious three-feature pre-decision model is significant
+($0.767$). Even that is almost useless as a \emph{decision},
 because a perfect gate saves 2.4\% of positive-gain mass relative
 to always forging.
-% v2 L14, L55
+% ADDENDUM section 3, section 5; v2 L55
 The 87\% base rate, 23/61 zero-base format unlocks, and McNemar's
 two significant negatives are the same fact: no-go is scarce.
 Instruction text does not replace the probe (semantic AUC 0.51).

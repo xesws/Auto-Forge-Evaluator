@@ -8,7 +8,7 @@
 \item {\bf Claims}
     \item[] Question: Do the main claims made in the abstract and introduction accurately reflect the paper's contributions and scope?
     \item[] Answer: \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
-    \item[] Justification: The abstract and Part 1 state the ranking, registered-negative, and revision-main results with the same numbers as ANALYSIS\_RESULTS\_v2.
+    \item[] Justification: The abstract and Part 1 state the ranking, registered-negative, and revision results with the same numbers as ANALYSIS\_RESULTS\_v2 and its correction file ANALYSIS\_RESULTS\_v2\_ADDENDUM, which supersedes the v2 attribution; the abstract claims the fix-invariant three-feature row, not the 0.844 row.
     \item[] Guidelines:
     \begin{itemize}
         \item The answer \answerNA{} means that the abstract and introduction do not include the claims made in the paper.
@@ -20,7 +20,7 @@
 \item {\bf Limitations}
     \item[] Question: Does the paper discuss the limitations of the work performed by the authors?
     \item[] Answer: \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
-    \item[] Justification: Part 1 Primary Result and Part 2 Limitations: one base, one recipe, scarce no-go, BIRD/APPS logistics excludes, LogME/LEEP not run.
+    \item[] Justification: Part 1 Primary Result and Part 2 Limitations: one base, one recipe, one seed, scarce no-go (2 substantive negatives), a drop-one-negative jackknife range of [0.685, 0.871], BIRD/APPS logistics excludes, LogME/LEEP not run, single fidelity point.
     \item[] Guidelines:
     \begin{itemize}
         \item The answer \answerNA{} means that the paper has no limitation while the answer \answerNo{} means that the paper has limitations, but those are not discussed in the paper. 
@@ -98,7 +98,7 @@
 \item {\bf Experiment statistical significance}
     \item[] Question: Does the paper report error bars suitably and correctly defined or other appropriate information about the statistical significance of the experiments?
     \item[] Answer: \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
-    \item[] Justification: Task-level bootstrap 95\% CIs and a 1000-fold label permutation; McNemar exact tests are uncorrected and labelled as such.
+    \item[] Justification: Task-level bootstrap 95\% CIs and a 1000-fold label permutation with a full LOTO refit per permutation, reported as (1+k)/(1+N); a drop-one-negative jackknife bounds estimator stability; McNemar exact tests and the five single-feature tests are uncorrected and labelled as such.
     \item[] Guidelines:
     \begin{itemize}
         \item The answer \answerNA{} means that the paper does not include experiments.
